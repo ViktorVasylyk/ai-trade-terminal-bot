@@ -33,6 +33,7 @@ def main_keyboard() -> ReplyKeyboardMarkup:
         input_field_placeholder="Нажми кнопку, чтобы открыть терминал"
     )
 
+
 # =========================================
 # BOT START
 # =========================================
@@ -40,12 +41,11 @@ def main_keyboard() -> ReplyKeyboardMarkup:
 async def start_handler(message: Message):
     text = (
         "🤖 <b>Добро пожаловать в торгового бота нового поколения</b>\n\n"
-        "Этот терминал создан на базе современных технологий анализа рынка и интеллектуальной логики принятия решений.\n\n"
-        "⚡ Быстро\n"
-        "🧠 Умно\n"
-        "📈 Удобно\n"
-        "💎 Профессионально\n\n"
-        "Это современный торговый продукт с удобным терминалом, обучением и поддержкой внутри Telegram.\n\n"
+        "Этот терминал создан в современном стиле и объединяет торговые сигналы, обучение и поддержку внутри Telegram.\n\n"
+        "⚡ Профессиональный интерфейс\n"
+        "🧠 Удобная логика работы\n"
+        "📈 Быстрый доступ к рынкам\n"
+        "💎 Премиальный дизайн\n\n"
         "Чтобы начать работу, нажми кнопку ниже:\n"
         "<b>🚀 Открыть терминал</b>"
     )
@@ -54,6 +54,7 @@ async def start_handler(message: Message):
         parse_mode="HTML",
         reply_markup=main_keyboard()
     )
+
 
 # =========================================
 # HTML TERMINAL
@@ -65,23 +66,28 @@ def build_html() -> str:
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AI Trade Terminal</title>
+  <title>Chrome Trade Terminal</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
-      --bg:#070b14;
-      --bg2:#0d1322;
-      --card:#10192c;
-      --card2:#131f36;
-      --line:rgba(255,255,255,.08);
-      --text:#ffffff;
-      --muted:#9db0d2;
-      --blue:#3b82f6;
-      --blue2:#2563eb;
-      --green:#22c55e;
-      --red:#ef4444;
-      --shadow:0 12px 40px rgba(0,0,0,.35);
-      --radius:20px;
+      --bg:#0f1114;
+      --bg2:#171a1f;
+      --card:#1b1e24;
+      --card2:#22262e;
+      --line:rgba(255,255,255,.10);
+      --text:#f2f4f8;
+      --muted:#b8bec8;
+      --silver:#c9ced6;
+      --silver2:#9aa3af;
+      --silver3:#e2e6eb;
+      --chrome1:#8d96a3;
+      --chrome2:#c7ccd4;
+      --chrome3:#eef1f5;
+      --dark:#111317;
+      --green:#7ee7b7;
+      --red:#ff9b9b;
+      --shadow:0 14px 50px rgba(0,0,0,.35);
+      --radius:22px;
     }
 
     *{
@@ -93,23 +99,23 @@ def build_html() -> str:
     }
 
     body{
-      background:
-        radial-gradient(circle at top right, rgba(59,130,246,.15), transparent 25%),
-        radial-gradient(circle at bottom left, rgba(37,99,235,.12), transparent 25%),
-        linear-gradient(180deg, #060913 0%, #0b1220 100%);
-      color:var(--text);
       min-height:100vh;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.08), transparent 20%),
+        radial-gradient(circle at bottom left, rgba(180,190,200,.08), transparent 25%),
+        linear-gradient(180deg, #0c0e11 0%, #15181d 50%, #0d1014 100%);
     }
 
     .wrap{
       max-width:560px;
       margin:0 auto;
-      padding:16px 16px 95px;
+      padding:16px 16px 100px;
     }
 
     .screen{
       display:none;
-      animation:fade .2s ease;
+      animation:fade .22s ease;
     }
 
     .screen.active{
@@ -117,7 +123,7 @@ def build_html() -> str:
     }
 
     @keyframes fade{
-      from{opacity:.5; transform:translateY(6px);}
+      from{opacity:.45; transform:translateY(8px);}
       to{opacity:1; transform:translateY(0);}
     }
 
@@ -125,8 +131,8 @@ def build_html() -> str:
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:16px;
       gap:12px;
+      margin-bottom:16px;
     }
 
     .brand{
@@ -136,21 +142,26 @@ def build_html() -> str:
     }
 
     .logo{
-      width:44px;
-      height:44px;
-      border-radius:14px;
-      background:linear-gradient(135deg, var(--blue), var(--blue2));
+      width:46px;
+      height:46px;
+      border-radius:16px;
+      background:
+        linear-gradient(135deg, #69707c 0%, #cfd5dd 35%, #7e8897 55%, #eef2f6 100%);
+      color:#111;
       display:flex;
       align-items:center;
       justify-content:center;
       font-size:20px;
+      font-weight:900;
       box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.20);
     }
 
     .title{
       font-size:22px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.2px;
+      color:var(--silver3);
     }
 
     .subtitle{
@@ -160,59 +171,63 @@ def build_html() -> str:
     }
 
     .vip{
-      background:linear-gradient(135deg,#19315d,#244eb0);
-      border:1px solid rgba(255,255,255,.08);
-      color:#e9f1ff;
       border-radius:14px;
       padding:9px 12px;
-      font-weight:700;
+      font-weight:800;
       font-size:12px;
       white-space:nowrap;
+      color:#101216;
+      background:
+        linear-gradient(135deg, #7e8793 0%, #d7dce3 38%, #9aa2ae 58%, #f1f4f7 100%);
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow:var(--shadow);
     }
 
     .card{
-      background:linear-gradient(180deg,var(--card),var(--card2));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:16px;
-      box-shadow:var(--shadow);
       margin-bottom:14px;
+      padding:16px;
+      border-radius:var(--radius);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),
+        linear-gradient(180deg, var(--card), var(--card2));
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
     }
 
     .hero{
       padding:18px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 25%),
+        linear-gradient(135deg, #20242b, #151920 65%, #262b34);
     }
 
     .hero-title{
       font-size:24px;
-      font-weight:800;
+      font-weight:900;
       line-height:1.2;
       margin-bottom:8px;
+      color:#f6f8fb;
     }
 
     .hero-text{
       color:var(--muted);
       font-size:13px;
-      line-height:1.55;
-    }
-
-    .glow{
-      background:
-        linear-gradient(135deg, rgba(59,130,246,.16), rgba(37,99,235,.05)),
-        linear-gradient(180deg,var(--card),var(--card2));
+      line-height:1.6;
     }
 
     .section-title{
       font-size:18px;
-      font-weight:800;
+      font-weight:900;
       margin-bottom:12px;
+      color:#f4f6f9;
     }
 
     .section-sub{
       color:var(--muted);
       font-size:13px;
       margin-bottom:12px;
-      line-height:1.5;
+      line-height:1.55;
     }
 
     .menu-grid{
@@ -225,67 +240,48 @@ def build_html() -> str:
       width:100%;
       border:none;
       cursor:pointer;
-      border-radius:18px;
+      border-radius:20px;
       padding:16px;
       text-align:left;
       color:#fff;
-      background:linear-gradient(135deg,#152543,#1d335b);
-      border:1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.02)),
+        linear-gradient(135deg, #1b2027, #2a3039 55%, #171b22);
+      border:1px solid rgba(255,255,255,.10);
       box-shadow:var(--shadow);
     }
 
     .menu-btn.primary{
-      background:linear-gradient(135deg,#2450b7,#2f6df6);
+      color:#111318;
+      background:
+        linear-gradient(135deg, #868f9b 0%, #d4d9e0 35%, #9da6b1 60%, #f4f7fa 100%);
+      border:1px solid rgba(255,255,255,.15);
     }
 
-    .menu-btn .menu-title{
+    .menu-title{
       font-size:16px;
-      font-weight:800;
+      font-weight:900;
       margin-bottom:4px;
     }
 
-    .menu-btn .menu-desc{
-      color:#d6e2ff;
-      opacity:.82;
+    .menu-desc{
       font-size:12px;
-      line-height:1.45;
+      line-height:1.5;
+      color:#d8dee7;
+      opacity:.92;
     }
 
-    .back-btn{
-      width:100%;
-      border:none;
-      cursor:pointer;
-      border-radius:16px;
-      padding:14px;
-      text-align:center;
-      color:#fff;
-      background:#18243d;
-      border:1px solid rgba(255,255,255,.08);
-      font-weight:700;
-      margin-top:8px;
-    }
-
-    .next-btn{
-      width:100%;
-      border:none;
-      cursor:pointer;
-      border-radius:16px;
-      padding:14px;
-      text-align:center;
-      color:#fff;
-      background:linear-gradient(135deg,#2759cf,#3b82f6);
-      border:1px solid rgba(255,255,255,.08);
-      font-weight:800;
-      margin-top:10px;
+    .menu-btn.primary .menu-desc{
+      color:#2d333c;
     }
 
     .search{
       width:100%;
-      background:#0b1425;
+      background:#12161c;
       color:#fff;
-      border:1px solid rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
       border-radius:16px;
-      padding:14px 14px;
+      padding:14px;
       outline:none;
       font-size:14px;
       margin-bottom:12px;
@@ -303,16 +299,17 @@ def build_html() -> str:
       cursor:pointer;
       padding:10px 12px;
       border-radius:14px;
-      background:#172238;
-      color:#dbe7ff;
-      border:1px solid rgba(255,255,255,.06);
+      background:#1b212a;
+      color:#d9dfe7;
+      border:1px solid rgba(255,255,255,.08);
       font-size:12px;
-      font-weight:700;
+      font-weight:800;
     }
 
     .tf-btn.active{
-      background:linear-gradient(135deg,#2759cf,#3b82f6);
-      color:white;
+      color:#101216;
+      background:
+        linear-gradient(135deg, #8c95a2 0%, #d8dde4 38%, #9da6b1 62%, #eef2f6 100%);
     }
 
     .asset-list{
@@ -329,14 +326,14 @@ def build_html() -> str:
       gap:12px;
       padding:14px;
       border-radius:16px;
-      background:#0f182b;
-      border:1px solid rgba(255,255,255,.06);
+      background:#131820;
+      border:1px solid rgba(255,255,255,.07);
       cursor:pointer;
     }
 
     .asset-name{
       font-size:15px;
-      font-weight:800;
+      font-weight:900;
     }
 
     .asset-meta{
@@ -347,12 +344,54 @@ def build_html() -> str:
 
     .badge-mini{
       font-size:11px;
-      font-weight:800;
+      font-weight:900;
       border-radius:12px;
       padding:8px 10px;
-      background:rgba(59,130,246,.14);
-      color:#cfe0ff;
+      background:rgba(255,255,255,.08);
+      color:#edf1f6;
       white-space:nowrap;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .loading-box{
+      margin-top:12px;
+      border-radius:18px;
+      padding:16px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+        #151a22;
+      border:1px solid rgba(255,255,255,.08);
+      display:none;
+    }
+
+    .loading-title{
+      font-size:16px;
+      font-weight:900;
+      margin-bottom:8px;
+    }
+
+    .loading-text{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      margin-bottom:12px;
+    }
+
+    .loading-bar{
+      width:100%;
+      height:10px;
+      background:#1a212b;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .loading-fill{
+      height:100%;
+      width:0%;
+      background:
+        linear-gradient(135deg, #8d96a3 0%, #d4d9e0 35%, #a2abb5 65%, #eef2f6 100%);
+      transition:width .25s linear;
     }
 
     .signal-box{
@@ -360,9 +399,10 @@ def build_html() -> str:
       border-radius:18px;
       padding:16px;
       background:
-        linear-gradient(135deg, rgba(59,130,246,.10), rgba(255,255,255,.02)),
-        #0d1729;
+        linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+        #141a23;
       border:1px solid rgba(255,255,255,.08);
+      display:none;
     }
 
     .signal-label{
@@ -387,45 +427,60 @@ def build_html() -> str:
     .chip{
       padding:10px 12px;
       border-radius:14px;
-      background:#15233d;
+      background:#18202b;
       border:1px solid rgba(255,255,255,.06);
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
     }
 
     .dir-up{
-      color:#7df7a6;
+      color:var(--green);
     }
 
     .dir-down{
-      color:#ff8f8f;
+      color:var(--red);
     }
 
-    .generate-btn{
+    .generate-btn,
+    .next-btn,
+    .back-btn{
       width:100%;
       border:none;
       cursor:pointer;
       border-radius:16px;
-      padding:15px;
-      margin-top:12px;
-      font-size:15px;
-      font-weight:800;
-      color:#fff;
-      background:linear-gradient(135deg,#2d61df,#3b82f6);
+      padding:14px;
+      font-size:14px;
+      font-weight:900;
+      margin-top:10px;
       box-shadow:var(--shadow);
     }
 
-    .support-item{
+    .generate-btn,
+    .next-btn{
+      color:#111318;
+      background:
+        linear-gradient(135deg, #8b95a1 0%, #d8dde4 38%, #9da5b0 62%, #f1f4f7 100%);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .back-btn{
+      color:#fff;
+      background:#1a2029;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .support-item,
+    .lesson-box{
       padding:14px;
-      border-radius:16px;
-      background:#101a2d;
-      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;
+      background:#141a22;
+      border:1px solid rgba(255,255,255,.07);
       margin-bottom:10px;
     }
 
     .support-title{
       font-size:15px;
-      font-weight:800;
+      font-weight:900;
       margin-bottom:5px;
     }
 
@@ -435,18 +490,10 @@ def build_html() -> str:
       line-height:1.6;
     }
 
-    .lesson-box{
-      padding:16px;
-      border-radius:18px;
-      background:#0f182b;
-      border:1px solid rgba(255,255,255,.06);
-      margin-bottom:12px;
-    }
-
     .lesson-kicker{
-      color:#8fb2ff;
+      color:#d9dde3;
       font-size:11px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.4px;
       margin-bottom:8px;
       text-transform:uppercase;
@@ -460,18 +507,18 @@ def build_html() -> str:
     }
 
     .lesson-text{
-      color:#d4e0f7;
+      color:#dce3ec;
       font-size:14px;
-      line-height:1.7;
+      line-height:1.75;
       margin-bottom:12px;
     }
 
     .lesson-main{
       padding:12px;
       border-radius:14px;
-      background:rgba(59,130,246,.10);
-      border:1px solid rgba(59,130,246,.20);
-      color:#e6efff;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color:#f0f4f9;
       font-size:13px;
       line-height:1.6;
     }
@@ -481,7 +528,7 @@ def build_html() -> str:
       left:0;
       right:0;
       bottom:0;
-      background:rgba(8,11,19,.95);
+      background:rgba(11,13,17,.96);
       backdrop-filter:blur(12px);
       border-top:1px solid rgba(255,255,255,.08);
       padding:10px 12px 14px;
@@ -502,16 +549,17 @@ def build_html() -> str:
       border-radius:16px;
       padding:12px 8px;
       text-align:center;
-      background:#11182a;
-      color:#9db0d2;
+      background:#171b22;
+      color:#b8bec8;
       border:1px solid rgba(255,255,255,.06);
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
     }
 
     .tab-btn.active{
-      color:#fff;
-      background:linear-gradient(135deg,#234eb3,#3271f6);
+      color:#101216;
+      background:
+        linear-gradient(135deg, #8e98a4 0%, #d8dde4 38%, #9ba4af 60%, #eef2f6 100%);
     }
 
     .empty{
@@ -531,18 +579,18 @@ def build_html() -> str:
         <div class="brand">
           <div class="logo">⚡</div>
           <div>
-            <div class="title">AI Trade Terminal</div>
-            <div class="subtitle">Профессиональный торговый интерфейс</div>
+            <div class="title">Chrome Trade Terminal</div>
+            <div class="subtitle">Loft style • premium interface</div>
           </div>
         </div>
-        <div class="vip">2026 EDITION</div>
+        <div class="vip">2026 PRO</div>
       </div>
 
-      <div class="card hero glow">
-        <div class="hero-title">Добро пожаловать в торговый терминал</div>
+      <div class="card hero">
+        <div class="hero-title">Добро пожаловать в профессиональный терминал</div>
         <div class="hero-text">
-          Современный интерфейс для удобной работы с торговыми сигналами, обучением и поддержкой.
-          Всё собрано в одном красивом терминале внутри Telegram.
+          Современный trading mini app с торговыми сигналами, обучением и поддержкой.
+          Стильный серебристо-хромовый интерфейс, быстрый доступ к рынкам и удобная навигация.
         </div>
       </div>
 
@@ -553,17 +601,17 @@ def build_html() -> str:
         <div class="menu-grid">
           <button class="menu-btn primary" onclick="openTradeMenu()">
             <div class="menu-title">1. Начать торговлю</div>
-            <div class="menu-desc">ОТС, официальные валюты, акции, поиск активов, таймфреймы и генерация сигнала.</div>
+            <div class="menu-desc">ОТС, официальные активы, акции, криптовалюта, поиск активов, таймфреймы и сигналы.</div>
           </button>
 
           <button class="menu-btn" onclick="showScreen('education-menu')">
             <div class="menu-title">2. Обучение</div>
-            <div class="menu-desc">Полноценный курс: психология, понимание рынка и правила торговли.</div>
+            <div class="menu-desc">Психология, понимание рынка и правила торговли в формате мини-курса.</div>
           </button>
 
           <button class="menu-btn" onclick="showScreen('support')">
             <div class="menu-title">3. Поддержка</div>
-            <div class="menu-desc">Связь с поддержкой, помощь по терминалу и ответы на частые вопросы.</div>
+            <div class="menu-desc">Помощь по терминалу, ответы на частые вопросы и связь с менеджером.</div>
           </button>
         </div>
       </div>
@@ -583,10 +631,11 @@ def build_html() -> str:
 
       <div class="card">
         <div class="section-title">Рынки</div>
+
         <div class="menu-grid">
           <button class="menu-btn primary" onclick="openMarket('otc')">
             <div class="menu-title">1. Торговля ОТС</div>
-            <div class="menu-desc">Топовые OTC активы, быстрый поиск, таймфреймы и сигнал в 1 клик.</div>
+            <div class="menu-desc">Топовые OTC активы, поиск, таймфреймы и выдача сигнала после 5-секундного анализа.</div>
           </button>
 
           <button class="menu-btn" onclick="openMarket('official')">
@@ -597,6 +646,11 @@ def build_html() -> str:
           <button class="menu-btn" onclick="openMarket('stocks')">
             <div class="menu-title">3. Торговля Акциями</div>
             <div class="menu-desc">Популярные акции с быстрым переходом к сигналу и выбором времени входа.</div>
+          </button>
+
+          <button class="menu-btn" onclick="openMarket('crypto')">
+            <div class="menu-title">4. Торговля криптовалютой</div>
+            <div class="menu-desc">Криптоактивы с поиском, таймфреймами и генерацией сигнала.</div>
           </button>
         </div>
 
@@ -620,7 +674,7 @@ def build_html() -> str:
         <div class="section-title">Выбор актива</div>
         <input id="assetSearch" class="search" type="text" placeholder="Введи актив, например EUR/USD" oninput="renderAssets()" />
 
-        <div class="tf-row" id="timeframeRow">
+        <div class="tf-row">
           <button class="tf-btn active" data-tf="30 сек" onclick="selectTf('30 сек')">30 сек</button>
           <button class="tf-btn" data-tf="1 мин" onclick="selectTf('1 мин')">1 мин</button>
           <button class="tf-btn" data-tf="2 мин" onclick="selectTf('2 мин')">2 мин</button>
@@ -629,7 +683,15 @@ def build_html() -> str:
 
         <div class="asset-list" id="assetList"></div>
 
-        <div class="signal-box" id="signalBox" style="display:none;">
+        <div class="loading-box" id="loadingBox">
+          <div class="loading-title">Анализируем актив...</div>
+          <div class="loading-text" id="loadingText">Подготавливаем торговый сигнал</div>
+          <div class="loading-bar">
+            <div class="loading-fill" id="loadingFill"></div>
+          </div>
+        </div>
+
+        <div class="signal-box" id="signalBox">
           <div class="signal-label">Торговый сигнал</div>
           <div class="signal-asset" id="signalAsset">EUR/USD</div>
           <div class="signal-row">
@@ -782,6 +844,32 @@ def build_html() -> str:
       "Nike", "Disney", "Boeing", "Alibaba", "Uber", "Pfizer"
     ];
 
+    const CRYPTO_ASSETS = [
+      "Bitcoin",
+      "Ethereum",
+      "Litecoin",
+      "Dash",
+      "Chainlink",
+      "BCH/EUR",
+      "BCH/GBP",
+      "BCH/JPY",
+      "BTC/GBP",
+      "BTC/JPY",
+      "Bitcoin OTC",
+      "Ethereum OTC",
+      "Litecoin OTC",
+      "Solana OTC",
+      "Polkadot OTC",
+      "BNB OTC",
+      "Dogecoin OTC",
+      "Cardano OTC",
+      "Avalanche OTC",
+      "TRON OTC",
+      "Toncoin OTC",
+      "Polygon OTC",
+      "Bitcoin ETF OTC"
+    ];
+
     const LESSONS = {
       psychology: [
         {
@@ -899,7 +987,6 @@ def build_html() -> str:
       ]
     };
 
-    let currentScreen = "home";
     let currentMarket = "otc";
     let currentTf = "30 сек";
     let currentSelectedAsset = null;
@@ -914,9 +1001,7 @@ def build_html() -> str:
     }
 
     function showScreen(name) {
-      currentScreen = name;
       document.querySelectorAll(".screen").forEach(el => el.classList.remove("active"));
-
       const target = document.getElementById("screen-" + name);
       if (target) target.classList.add("active");
 
@@ -935,13 +1020,15 @@ def build_html() -> str:
     function getMarketAssets() {
       if (currentMarket === "otc") return OTC_ASSETS;
       if (currentMarket === "official") return OFFICIAL_ASSETS;
-      return STOCK_ASSETS;
+      if (currentMarket === "stocks") return STOCK_ASSETS;
+      return CRYPTO_ASSETS;
     }
 
     function getMarketLabel() {
       if (currentMarket === "otc") return "OTC";
       if (currentMarket === "official") return "OFFICIAL";
-      return "STOCKS";
+      if (currentMarket === "stocks") return "STOCKS";
+      return "CRYPTO";
     }
 
     function openMarket(type) {
@@ -952,19 +1039,26 @@ def build_html() -> str:
       const sub = document.getElementById("marketSub");
       const search = document.getElementById("assetSearch");
       const signalBox = document.getElementById("signalBox");
+      const loadingBox = document.getElementById("loadingBox");
+      const loadingFill = document.getElementById("loadingFill");
 
       signalBox.style.display = "none";
+      loadingBox.style.display = "none";
+      loadingFill.style.width = "0%";
       search.value = "";
 
       if (type === "otc") {
         title.innerText = "Торговля ОТС";
-        sub.innerText = "Топовые OTC активы и быстрые сигналы";
+        sub.innerText = "Топовые OTC активы и выдача сигнала после анализа";
       } else if (type === "official") {
         title.innerText = "Торговля Официалов";
         sub.innerText = "Официальные валютные пары";
-      } else {
+      } else if (type === "stocks") {
         title.innerText = "Торговля Акциями";
         sub.innerText = "Популярные акции для тестового режима";
+      } else {
+        title.innerText = "Торговля криптовалютой";
+        sub.innerText = "Криптоактивы для тестового режима";
       }
 
       showScreen("market");
@@ -978,7 +1072,11 @@ def build_html() -> str:
       if (active) active.classList.add("active");
 
       if (currentSelectedAsset) {
-        generateSignal(currentSelectedAsset);
+        if (currentMarket === "otc") {
+          startOtcLoading(currentSelectedAsset);
+        } else {
+          renderSignalNow(currentSelectedAsset);
+        }
       }
     }
 
@@ -986,7 +1084,6 @@ def build_html() -> str:
       const list = document.getElementById("assetList");
       const searchValue = document.getElementById("assetSearch").value.toLowerCase().trim();
       const marketAssets = getMarketAssets();
-
       const filtered = marketAssets.filter(a => a.toLowerCase().includes(searchValue));
 
       list.innerHTML = "";
@@ -1032,6 +1129,62 @@ def build_html() -> str:
 
     function generateSignal(asset) {
       currentSelectedAsset = asset;
+      if (currentMarket === "otc") {
+        startOtcLoading(asset);
+        return;
+      }
+      renderSignalNow(asset);
+    }
+
+    function startOtcLoading(asset) {
+      const loadingBox = document.getElementById("loadingBox");
+      const loadingFill = document.getElementById("loadingFill");
+      const loadingText = document.getElementById("loadingText");
+      const signalBox = document.getElementById("signalBox");
+
+      signalBox.style.display = "none";
+      loadingBox.style.display = "block";
+      loadingFill.style.width = "0%";
+
+      const loadingMessages = [
+        "Сканируем структуру движения...",
+        "Проверяем волатильность...",
+        "Формируем направление входа...",
+        "Подготавливаем итоговый сигнал..."
+      ];
+
+      let step = 0;
+      loadingText.innerText = loadingMessages[0];
+
+      const totalMs = 5000;
+      const intervalMs = 250;
+      const totalSteps = totalMs / intervalMs;
+      let current = 0;
+
+      const timer = setInterval(() => {
+        current += 1;
+        const percent = Math.min(100, Math.round((current / totalSteps) * 100));
+        loadingFill.style.width = percent + "%";
+
+        const msgIndex = Math.min(
+          loadingMessages.length - 1,
+          Math.floor((current / totalSteps) * loadingMessages.length)
+        );
+
+        if (msgIndex !== step) {
+          step = msgIndex;
+          loadingText.innerText = loadingMessages[msgIndex];
+        }
+
+        if (current >= totalSteps) {
+          clearInterval(timer);
+          loadingBox.style.display = "none";
+          renderSignalNow(asset);
+        }
+      }, intervalMs);
+    }
+
+    function renderSignalNow(asset) {
       const direction = randomDirection();
       const signalBox = document.getElementById("signalBox");
       const signalAsset = document.getElementById("signalAsset");
@@ -1057,7 +1210,12 @@ def build_html() -> str:
         generateSignal(marketAssets[0]);
         return;
       }
-      generateSignal(currentSelectedAsset);
+
+      if (currentMarket === "otc") {
+        startOtcLoading(currentSelectedAsset);
+      } else {
+        renderSignalNow(currentSelectedAsset);
+      }
     }
 
     function openLesson(group, index) {
@@ -1119,17 +1277,21 @@ def build_html() -> str:
 </html>
 """
 
+
 # =========================================
 # WEB ROUTES
 # =========================================
 async def index(request: web.Request) -> web.Response:
-    return web.Response(text="AI Trade Terminal is running", content_type="text/plain")
+    return web.Response(text="Chrome Trade Terminal is running", content_type="text/plain")
+
 
 async def app_page(request: web.Request) -> web.Response:
     return web.Response(text=build_html(), content_type="text/html")
 
+
 async def health(request: web.Request) -> web.Response:
     return web.json_response({"status": "ok"})
+
 
 def create_web_app() -> web.Application:
     app = web.Application()
@@ -1137,6 +1299,7 @@ def create_web_app() -> web.Application:
     app.router.add_get("/app", app_page)
     app.router.add_get("/health", health)
     return app
+
 
 # =========================================
 # STARTUP
@@ -1148,6 +1311,7 @@ async def start_web():
     site = web.TCPSite(runner, "0.0.0.0", PORT)
     await site.start()
     print(f"WEB STARTED ON PORT {PORT}")
+
 
 async def start_bot():
     if not BOT_TOKEN or BOT_TOKEN == "PASTE_YOUR_BOT_TOKEN":
@@ -1163,11 +1327,13 @@ async def start_bot():
     print("BOT STARTED")
     await dp.start_polling(bot)
 
+
 async def main():
     await asyncio.gather(
         start_web(),
         start_bot()
     )
+
 
 if __name__ == "__main__":
     asyncio.run(main())
