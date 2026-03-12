@@ -1,0 +1,17 @@
+{
+  "trader_links": {
+    "11": 8461542194
+  },
+  "user_links": {
+    "8461542194": "11"
+  },
+  "blocked_users": [],
+  "events": [
+    {
+      "ts": 1773072994,
+      "event": "bind_ok",
+      "user_id": 8461542194,
+      "trader_id": "11"
+    }
+  ]
+}
