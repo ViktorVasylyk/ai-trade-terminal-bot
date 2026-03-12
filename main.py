@@ -1,6 +1,5 @@
 import asyncio
 import os
-import random
 
 from aiohttp import web
 from aiogram import Bot, Dispatcher, Router
@@ -10,8 +9,8 @@ from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, WebAppIn
 # =========================================
 # CONFIG
 # =========================================
-BOT_TOKEN = os.getenv("BOT_TOKEN", "7713470997:AAFhROBNs4LE0EDCCqsyjkJ7SPrC1dDFuo4")
-BASE_URL = os.getenv("BASE_URL", "https://your-domain.up.railway.app")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "7713470997:AAEvpPQK_aw5A4REz7HLPXKKWtmT-kFoSzU")
+BASE_URL = os.getenv("BASE_URL", "https://ai-trade-terminal-bot-production.up.railway.app")
 PORT = int(os.getenv("PORT", "8080"))
 
 router = Router()
@@ -81,7 +80,6 @@ def build_html() -> str:
       --blue2:#2563eb;
       --green:#22c55e;
       --red:#ef4444;
-      --gold:#d4af37;
       --shadow:0 12px 40px rgba(0,0,0,.35);
       --radius:20px;
     }
@@ -267,6 +265,20 @@ def build_html() -> str:
       margin-top:8px;
     }
 
+    .next-btn{
+      width:100%;
+      border:none;
+      cursor:pointer;
+      border-radius:16px;
+      padding:14px;
+      text-align:center;
+      color:#fff;
+      background:linear-gradient(135deg,#2759cf,#3b82f6);
+      border:1px solid rgba(255,255,255,.08);
+      font-weight:800;
+      margin-top:10px;
+    }
+
     .search{
       width:100%;
       background:#0b1425;
@@ -420,7 +432,48 @@ def build_html() -> str:
     .support-text{
       color:var(--muted);
       font-size:13px;
-      line-height:1.5;
+      line-height:1.6;
+    }
+
+    .lesson-box{
+      padding:16px;
+      border-radius:18px;
+      background:#0f182b;
+      border:1px solid rgba(255,255,255,.06);
+      margin-bottom:12px;
+    }
+
+    .lesson-kicker{
+      color:#8fb2ff;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.4px;
+      margin-bottom:8px;
+      text-transform:uppercase;
+    }
+
+    .lesson-title{
+      font-size:20px;
+      font-weight:900;
+      margin-bottom:10px;
+      line-height:1.25;
+    }
+
+    .lesson-text{
+      color:#d4e0f7;
+      font-size:14px;
+      line-height:1.7;
+      margin-bottom:12px;
+    }
+
+    .lesson-main{
+      padding:12px;
+      border-radius:14px;
+      background:rgba(59,130,246,.10);
+      border:1px solid rgba(59,130,246,.20);
+      color:#e6efff;
+      font-size:13px;
+      line-height:1.6;
     }
 
     .bottom-tabs{
@@ -503,9 +556,9 @@ def build_html() -> str:
             <div class="menu-desc">ОТС, официальные валюты, акции, поиск активов, таймфреймы и генерация сигнала.</div>
           </button>
 
-          <button class="menu-btn" onclick="showScreen('education')">
+          <button class="menu-btn" onclick="showScreen('education-menu')">
             <div class="menu-title">2. Обучение</div>
-            <div class="menu-desc">Базовые принципы работы с сигналами, фильтрация входов и дисциплина.</div>
+            <div class="menu-desc">Полноценный курс: психология, понимание рынка и правила торговли.</div>
           </button>
 
           <button class="menu-btn" onclick="showScreen('support')">
@@ -594,38 +647,65 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- EDUCATION -->
-    <div id="screen-education" class="screen">
+    <!-- EDUCATION MENU -->
+    <div id="screen-education-menu" class="screen">
       <div class="topbar">
         <div class="brand">
           <div class="logo">🎓</div>
           <div>
             <div class="title">Обучение</div>
-            <div class="subtitle">Базовые правила и дисциплина</div>
+            <div class="subtitle">Мини-курс внутри терминала</div>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <div class="section-title">Основы работы</div>
-        <div class="support-item">
-          <div class="support-title">1. Не входи хаотично</div>
-          <div class="support-text">Всегда смотри на общий ритм рынка и не открывай сделки без логики и плана.</div>
-        </div>
-        <div class="support-item">
-          <div class="support-title">2. Не гонись за рынком</div>
-          <div class="support-text">Если движение уже прошло — лучше пропустить вход, чем залететь в конец импульса.</div>
-        </div>
-        <div class="support-item">
-          <div class="support-title">3. Уважай риск</div>
-          <div class="support-text">Фиксированная сумма на вход и контроль эмоций всегда важнее случайной удачи.</div>
-        </div>
-        <div class="support-item">
-          <div class="support-title">4. Сначала фильтр, потом вход</div>
-          <div class="support-text">Сигнал — это ориентир. Лучший результат даёт сигнал + здравый фильтр рынка.</div>
+        <div class="section-title">Разделы обучения</div>
+        <div class="section-sub">Изучи основу, без которой стабильная торговля невозможна.</div>
+
+        <div class="menu-grid">
+          <button class="menu-btn primary" onclick="openLesson('psychology', 0)">
+            <div class="menu-title">1. Психология</div>
+            <div class="menu-desc">Эмоции, дисциплина, страх, жадность, правильное состояние перед торговлей.</div>
+          </button>
+
+          <button class="menu-btn" onclick="openLesson('market', 0)">
+            <div class="menu-title">2. Что такое рынок</div>
+            <div class="menu-desc">Импульс, откат, тренд, флет, уровни, волатильность и логика движения цены.</div>
+          </button>
+
+          <button class="menu-btn" onclick="openLesson('rules', 0)">
+            <div class="menu-title">3. Правила торговли</div>
+            <div class="menu-desc">Когда входить, когда не входить, как фильтровать сделки и сохранять депозит.</div>
+          </button>
         </div>
 
         <button class="back-btn" onclick="showScreen('home')">⬅ Назад</button>
+      </div>
+    </div>
+
+    <!-- LESSON -->
+    <div id="screen-lesson" class="screen">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">📚</div>
+          <div>
+            <div class="title" id="lessonCategoryTitle">Обучение</div>
+            <div class="subtitle" id="lessonCategorySub">Теория и практика</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="lesson-box">
+          <div class="lesson-kicker" id="lessonKicker">Урок 1</div>
+          <div class="lesson-title" id="lessonTitle">Название урока</div>
+          <div class="lesson-text" id="lessonText">Текст урока</div>
+          <div class="lesson-main" id="lessonMain">Главная мысль</div>
+        </div>
+
+        <button class="next-btn" id="lessonNextBtn" onclick="nextLesson()">Следующий урок ➜</button>
+        <button class="back-btn" onclick="backFromLesson()">⬅ Назад</button>
       </div>
     </div>
 
@@ -666,7 +746,7 @@ def build_html() -> str:
   <div class="bottom-tabs">
     <div class="bottom-tabs-inner">
       <button id="tab-home" class="tab-btn active" onclick="showScreen('home')">Главная</button>
-      <button id="tab-education" class="tab-btn" onclick="showScreen('education')">Обучение</button>
+      <button id="tab-education" class="tab-btn" onclick="showScreen('education-menu')">Обучение</button>
       <button id="tab-support" class="tab-btn" onclick="showScreen('support')">Поддержка</button>
     </div>
   </div>
@@ -702,10 +782,130 @@ def build_html() -> str:
       "Nike", "Disney", "Boeing", "Alibaba", "Uber", "Pfizer"
     ];
 
+    const LESSONS = {
+      psychology: [
+        {
+          kicker: "Психология • Урок 1",
+          title: "Эмоции трейдера",
+          text: "Рынок не любит спешку, азарт и желание отыграться. Главная задача трейдера — сохранять спокойствие и принимать решения по системе, а не по эмоциям. Когда человек торгует на нервах, он перестаёт видеть рынок и начинает реагировать импульсивно.",
+          main: "Главная мысль: сильный трейдер не тот, кто торгует много, а тот, кто умеет сохранять контроль над собой."
+        },
+        {
+          kicker: "Психология • Урок 2",
+          title: "Страх и жадность",
+          text: "Страх заставляет пропускать хорошие входы. Жадность заставляет входить без подтверждения и брать лишние сделки. Оба состояния мешают торговле, потому что в этот момент решение принимает не система, а эмоция.",
+          main: "Главная мысль: страх и жадность всегда ломают дисциплину, если ты не умеешь замечать их вовремя."
+        },
+        {
+          kicker: "Психология • Урок 3",
+          title: "Почему новички сливают депозит",
+          text: "Основные причины: торговля без плана, завышенные суммы, попытка быстро отбить минус, входы без фильтра и хаотичное нажатие кнопок. Проблема не всегда в стратегии — чаще проблема в поведении самого трейдера.",
+          main: "Главная мысль: депозит чаще сливают не из-за рынка, а из-за отсутствия дисциплины."
+        },
+        {
+          kicker: "Психология • Урок 4",
+          title: "Дисциплина",
+          text: "Сильный трейдер отличается не количеством сделок, а качеством решений. Иногда лучший ход — это пропустить вход. Если ты не умеешь ждать, ты будешь входить в слабые ситуации и отдавать деньги рынку.",
+          main: "Главная мысль: лучше 2 точных входа, чем 15 хаотичных."
+        },
+        {
+          kicker: "Психология • Урок 5",
+          title: "Правильное состояние перед торговлей",
+          text: "Перед сессией ты должен быть спокойным, собранным и готовым пропускать плохие сигналы. Если ты раздражён, уставший или хочешь быстро заработать любой ценой — это уже плохое состояние для торговли.",
+          main: "Главная мысль: сначала состояние, потом рынок. Нервный трейдер почти всегда принимает плохие решения."
+        }
+      ],
+      market: [
+        {
+          kicker: "Рынок • Урок 1",
+          title: "Что такое рынок простыми словами",
+          text: "Рынок — это постоянное движение цены вверх и вниз под влиянием покупателей и продавцов. Цена меняется потому, что одна сторона сильнее другой. Задача трейдера — не угадывать всё подряд, а найти момент, где вероятность движения выше.",
+          main: "Главная мысль: рынок — это борьба сторон, а не случайный хаос."
+        },
+        {
+          kicker: "Рынок • Урок 2",
+          title: "Почему цена движется",
+          text: "Цена движется из-за спроса, предложения, новостей, волатильности и активности участников. Иногда движение плавное, иногда резкое. Чтобы торговать лучше, нужно понимать не просто направление, а контекст движения.",
+          main: "Главная мысль: цена не двигается просто так — у любого движения есть причина."
+        },
+        {
+          kicker: "Рынок • Урок 3",
+          title: "Импульс и откат",
+          text: "Импульс — это сильное движение цены в одну сторону. Откат — это временное движение против основного импульса. Очень важно не путать эти два состояния, иначе можно войти в рынок в самый неудобный момент.",
+          main: "Главная мысль: не входи в конец импульса и учись видеть, где цена уже перегрета."
+        },
+        {
+          kicker: "Рынок • Урок 4",
+          title: "Тренд и флет",
+          text: "Тренд — это устойчивое направленное движение цены. Флет — это боковое движение без явного лидера. Одни входы хорошо работают в тренде, другие — во флете. Если не понимать фазу рынка, входы будут случайными.",
+          main: "Главная мысль: сначала определи фазу рынка, потом ищи вход."
+        },
+        {
+          kicker: "Рынок • Урок 5",
+          title: "Поддержка и сопротивление",
+          text: "Поддержка — зона, где цена часто удерживается от падения. Сопротивление — зона, где цена часто удерживается от роста. Это одни из самых сильных ориентиров в торговле, потому что у уровней часто скапливается реакция рынка.",
+          main: "Главная мысль: уровни — это основа понимания, где цена может остановиться или развернуться."
+        },
+        {
+          kicker: "Рынок • Урок 6",
+          title: "Волатильность",
+          text: "Волатильность — это скорость и сила движения цены. Когда рынок слишком резкий, короткие входы становятся опаснее. Высокая волатильность без понимания структуры часто приводит к хаотичным сделкам.",
+          main: "Главная мысль: не каждый быстрый рынок подходит для входа."
+        }
+      ],
+      rules: [
+        {
+          kicker: "Правила • Урок 1",
+          title: "Не входи без причины",
+          text: "Каждая сделка должна иметь логичную причину: уровень, импульс, подтверждение, структура движения. Если причина входа звучит как 'мне кажется', значит это слабая сделка.",
+          main: "Главная мысль: хорошая сделка всегда объяснима."
+        },
+        {
+          kicker: "Правила • Урок 2",
+          title: "Не торгуй на эмоциях",
+          text: "После минуса у многих появляется желание сразу открыть следующую сделку, чтобы отбиться. Это одна из главных ошибок. Сделка после эмоции редко бывает сильной.",
+          main: "Главная мысль: эмоция не может быть основанием для входа."
+        },
+        {
+          kicker: "Правила • Урок 3",
+          title: "Работай с фиксированной суммой",
+          text: "На маленьком депозите не увеличивай сумму хаотично. Торговля должна быть стабильной. Один неправильный шаг на завышенной сумме может перечеркнуть всё, что заработано до этого.",
+          main: "Главная мысль: стабильность важнее агрессии."
+        },
+        {
+          kicker: "Правила • Урок 4",
+          title: "Не входи в длинные тени",
+          text: "Если свечи рваные, с большими тенями и рынок дёргается, вход становится слабее. Такой рынок труднее читать, особенно на коротких таймфреймах.",
+          main: "Главная мысль: если рынок выглядит грязно — лучше пропустить."
+        },
+        {
+          kicker: "Правила • Урок 5",
+          title: "Не входи в конец импульса",
+          text: "Когда движение уже прошло большую часть пути, вход часто становится поздним. Новички любят влетать именно туда, где движение уже выдохлось.",
+          main: "Главная мысль: чем позже вход, тем слабее вероятность."
+        },
+        {
+          kicker: "Правила • Урок 6",
+          title: "Лучше пропустить, чем залететь случайно",
+          text: "Пропущенная плохая сделка — это не потеря, а сохранённый депозит. Торговля строится не только на хороших входах, но и на умении отказаться от слабых.",
+          main: "Главная мысль: умение не входить — это часть профессионализма."
+        },
+        {
+          kicker: "Правила • Урок 7",
+          title: "После серии минусов — пауза",
+          text: "Несколько неудач подряд часто ломают психологию. В этот момент решения становятся всё хуже. Лучше остановиться, выдохнуть и вернуться позже, чем продолжать ломать депозит.",
+          main: "Главная мысль: пауза после эмоциональной просадки — это сила, а не слабость."
+        }
+      ]
+    };
+
     let currentScreen = "home";
     let currentMarket = "otc";
     let currentTf = "30 сек";
     let currentSelectedAsset = null;
+
+    let currentLessonGroup = "psychology";
+    let currentLessonIndex = 0;
 
     function setBottomTab(id) {
       document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
@@ -721,7 +921,7 @@ def build_html() -> str:
       if (target) target.classList.add("active");
 
       if (name === "home") setBottomTab("home");
-      if (name === "education") setBottomTab("education");
+      if (name === "education-menu" || name === "lesson") setBottomTab("education");
       if (name === "support") setBottomTab("support");
       if (name === "trade-menu" || name === "market") {
         document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
@@ -859,6 +1059,61 @@ def build_html() -> str:
       }
       generateSignal(currentSelectedAsset);
     }
+
+    function openLesson(group, index) {
+      currentLessonGroup = group;
+      currentLessonIndex = index;
+      renderLesson();
+      showScreen("lesson");
+    }
+
+    function renderLesson() {
+      const lesson = LESSONS[currentLessonGroup][currentLessonIndex];
+
+      const categoryTitle = document.getElementById("lessonCategoryTitle");
+      const categorySub = document.getElementById("lessonCategorySub");
+      const kicker = document.getElementById("lessonKicker");
+      const title = document.getElementById("lessonTitle");
+      const text = document.getElementById("lessonText");
+      const main = document.getElementById("lessonMain");
+      const nextBtn = document.getElementById("lessonNextBtn");
+
+      if (currentLessonGroup === "psychology") {
+        categoryTitle.innerText = "Психология";
+        categorySub.innerText = "Контроль эмоций и дисциплина";
+      } else if (currentLessonGroup === "market") {
+        categoryTitle.innerText = "Что такое рынок";
+        categorySub.innerText = "Понимание структуры движения цены";
+      } else {
+        categoryTitle.innerText = "Правила торговли";
+        categorySub.innerText = "Фильтрация входов и защита депозита";
+      }
+
+      kicker.innerText = lesson.kicker;
+      title.innerText = lesson.title;
+      text.innerText = lesson.text;
+      main.innerText = lesson.main;
+
+      if (currentLessonIndex >= LESSONS[currentLessonGroup].length - 1) {
+        nextBtn.innerText = "Вернуться в обучение";
+      } else {
+        nextBtn.innerText = "Следующий урок ➜";
+      }
+    }
+
+    function nextLesson() {
+      const lessons = LESSONS[currentLessonGroup];
+      if (currentLessonIndex >= lessons.length - 1) {
+        showScreen("education-menu");
+        return;
+      }
+      currentLessonIndex += 1;
+      renderLesson();
+    }
+
+    function backFromLesson() {
+      showScreen("education-menu");
+    }
   </script>
 </body>
 </html>
@@ -896,9 +1151,9 @@ async def start_web():
 
 async def start_bot():
     if not BOT_TOKEN or BOT_TOKEN == "PASTE_YOUR_BOT_TOKEN":
-      raise RuntimeError("Укажи BOT_TOKEN")
+        raise RuntimeError("Укажи BOT_TOKEN")
     if not BASE_URL or BASE_URL == "https://your-domain.up.railway.app":
-      raise RuntimeError("Укажи BASE_URL")
+        raise RuntimeError("Укажи BASE_URL")
 
     bot = Bot(BOT_TOKEN)
     dp = Dispatcher()
