@@ -33,7 +33,6 @@ def main_keyboard() -> ReplyKeyboardMarkup:
         input_field_placeholder="Нажми кнопку, чтобы открыть терминал"
     )
 
-
 # =========================================
 # BOT START
 # =========================================
@@ -54,7 +53,6 @@ async def start_handler(message: Message):
         parse_mode="HTML",
         reply_markup=main_keyboard()
     )
-
 
 # =========================================
 # HTML TERMINAL
@@ -394,7 +392,7 @@ def build_html() -> str:
       transition:width .25s linear;
     }
 
-    .signal-box{
+    .analysis-box{
       margin-top:12px;
       border-radius:18px;
       padding:16px;
@@ -402,26 +400,38 @@ def build_html() -> str:
         linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
         #141a23;
       border:1px solid rgba(255,255,255,.08);
-      display:none;
     }
 
-    .signal-label{
+    .analysis-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .analysis-label{
       color:var(--muted);
       font-size:12px;
-      margin-bottom:8px;
+      margin-bottom:6px;
     }
 
-    .signal-asset{
-      font-size:22px;
+    .analysis-asset{
+      font-size:24px;
       font-weight:900;
-      margin-bottom:10px;
+      margin-bottom:4px;
+    }
+
+    .analysis-market{
+      font-size:12px;
+      color:var(--muted);
     }
 
     .signal-row{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
 
     .chip{
@@ -441,7 +451,14 @@ def build_html() -> str:
       color:var(--red);
     }
 
-    .generate-btn,
+    .analysis-comment{
+      color:#dce3ec;
+      font-size:14px;
+      line-height:1.65;
+      margin-bottom:6px;
+    }
+
+    .action-btn,
     .next-btn,
     .back-btn{
       width:100%;
@@ -455,7 +472,7 @@ def build_html() -> str:
       box-shadow:var(--shadow);
     }
 
-    .generate-btn,
+    .action-btn.primary,
     .next-btn{
       color:#111318;
       background:
@@ -463,6 +480,7 @@ def build_html() -> str:
       border:1px solid rgba(255,255,255,.12);
     }
 
+    .action-btn.secondary,
     .back-btn{
       color:#fff;
       background:#1a2029;
@@ -645,7 +663,7 @@ def build_html() -> str:
 
           <button class="menu-btn" onclick="openMarket('stocks')">
             <div class="menu-title">3. Торговля Акциями</div>
-            <div class="menu-desc">Популярные акции с быстрым переходом к сигналу и выбором времени входа.</div>
+            <div class="menu-desc">Популярные акции с быстрым переходом к анализу и выбором времени входа.</div>
           </button>
 
           <button class="menu-btn" onclick="openMarket('crypto')">
@@ -658,14 +676,14 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- MARKET -->
-    <div id="screen-market" class="screen">
+    <!-- MARKET LIST -->
+    <div id="screen-market-list" class="screen">
       <div class="topbar">
         <div class="brand">
           <div class="logo">💹</div>
           <div>
             <div class="title" id="marketTitle">Рынок</div>
-            <div class="subtitle" id="marketSub">Выбор актива и генерация сигнала</div>
+            <div class="subtitle" id="marketSub">Выбор актива</div>
           </div>
         </div>
       </div>
@@ -683,6 +701,23 @@ def build_html() -> str:
 
         <div class="asset-list" id="assetList"></div>
 
+        <button class="back-btn" onclick="showScreen('trade-menu')">⬅ Назад</button>
+      </div>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div id="screen-analysis" class="screen">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">🧠</div>
+          <div>
+            <div class="title">Анализ актива</div>
+            <div class="subtitle">Подготовка и генерация сигнала</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="loading-box" id="loadingBox">
           <div class="loading-title">Анализируем актив...</div>
           <div class="loading-text" id="loadingText">Подготавливаем торговый сигнал</div>
@@ -691,21 +726,30 @@ def build_html() -> str:
           </div>
         </div>
 
-        <div class="signal-box" id="signalBox">
-          <div class="signal-label">Торговый сигнал</div>
-          <div class="signal-asset" id="signalAsset">EUR/USD</div>
+        <div class="analysis-box" id="analysisBox" style="display:none;">
+          <div class="analysis-head">
+            <div>
+              <div class="analysis-label">Актив</div>
+              <div class="analysis-asset" id="signalAsset">EUR/USD</div>
+              <div class="analysis-market" id="signalMarketLine">OTC • 30 сек</div>
+            </div>
+          </div>
+
           <div class="signal-row">
             <div class="chip" id="signalDirection">ВВЕРХ</div>
             <div class="chip" id="signalTime">30 сек</div>
             <div class="chip" id="signalType">OTC</div>
           </div>
-          <div class="section-sub" id="signalComment" style="margin:0;">
+
+          <div class="analysis-comment" id="signalComment">
             Сигнал сгенерирован для тестового режима терминала.
           </div>
-          <button class="generate-btn" onclick="generateCurrentSignal()">🔁 Сгенерировать ещё сигнал</button>
+
+          <button class="action-btn primary" onclick="generateCurrentSignal()">🔁 Сгенерировать еще сигнал</button>
+          <button class="action-btn secondary" onclick="backToAssets()">📂 Выбрать другой актив</button>
         </div>
 
-        <button class="back-btn" onclick="showScreen('trade-menu')">⬅ Назад</button>
+        <button class="back-btn" onclick="backToAssets()">⬅ Назад</button>
       </div>
     </div>
 
@@ -1008,7 +1052,7 @@ def build_html() -> str:
       if (name === "home") setBottomTab("home");
       if (name === "education-menu" || name === "lesson") setBottomTab("education");
       if (name === "support") setBottomTab("support");
-      if (name === "trade-menu" || name === "market") {
+      if (name === "trade-menu" || name === "market-list" || name === "analysis") {
         document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
       }
     }
@@ -1038,30 +1082,24 @@ def build_html() -> str:
       const title = document.getElementById("marketTitle");
       const sub = document.getElementById("marketSub");
       const search = document.getElementById("assetSearch");
-      const signalBox = document.getElementById("signalBox");
-      const loadingBox = document.getElementById("loadingBox");
-      const loadingFill = document.getElementById("loadingFill");
 
-      signalBox.style.display = "none";
-      loadingBox.style.display = "none";
-      loadingFill.style.width = "0%";
       search.value = "";
 
       if (type === "otc") {
         title.innerText = "Торговля ОТС";
-        sub.innerText = "Топовые OTC активы и выдача сигнала после анализа";
+        sub.innerText = "Выбор OTC актива";
       } else if (type === "official") {
         title.innerText = "Торговля Официалов";
-        sub.innerText = "Официальные валютные пары";
+        sub.innerText = "Выбор официального актива";
       } else if (type === "stocks") {
         title.innerText = "Торговля Акциями";
-        sub.innerText = "Популярные акции для тестового режима";
+        sub.innerText = "Выбор акции";
       } else {
         title.innerText = "Торговля криптовалютой";
-        sub.innerText = "Криптоактивы для тестового режима";
+        sub.innerText = "Выбор криптоактива";
       }
 
-      showScreen("market");
+      showScreen("market-list");
       renderAssets();
     }
 
@@ -1070,14 +1108,6 @@ def build_html() -> str:
       document.querySelectorAll(".tf-btn").forEach(btn => btn.classList.remove("active"));
       const active = document.querySelector(`.tf-btn[data-tf="${tf}"]`);
       if (active) active.classList.add("active");
-
-      if (currentSelectedAsset) {
-        if (currentMarket === "otc") {
-          startOtcLoading(currentSelectedAsset);
-        } else {
-          renderSignalNow(currentSelectedAsset);
-        }
-      }
     }
 
     function renderAssets() {
@@ -1099,13 +1129,39 @@ def build_html() -> str:
         el.innerHTML = `
           <div>
             <div class="asset-name">${asset}</div>
-            <div class="asset-meta">Нажми для генерации сигнала</div>
+            <div class="asset-meta">Нажми для открытия анализа</div>
           </div>
           <div class="badge-mini">${getMarketLabel()}</div>
         `;
-        el.onclick = () => generateSignal(asset);
+        el.onclick = () => openAnalysis(asset);
         list.appendChild(el);
       });
+    }
+
+    function openAnalysis(asset) {
+      currentSelectedAsset = asset;
+
+      const loadingBox = document.getElementById("loadingBox");
+      const analysisBox = document.getElementById("analysisBox");
+      const loadingFill = document.getElementById("loadingFill");
+      const loadingText = document.getElementById("loadingText");
+
+      loadingBox.style.display = "none";
+      analysisBox.style.display = "none";
+      loadingFill.style.width = "0%";
+      loadingText.innerText = "Подготавливаем торговый сигнал";
+
+      showScreen("analysis");
+
+      if (currentMarket === "otc") {
+        startOtcLoading(asset);
+      } else {
+        renderSignalNow(asset);
+      }
+    }
+
+    function backToAssets() {
+      showScreen("market-list");
     }
 
     function randomDirection() {
@@ -1127,22 +1183,13 @@ def build_html() -> str:
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    function generateSignal(asset) {
-      currentSelectedAsset = asset;
-      if (currentMarket === "otc") {
-        startOtcLoading(asset);
-        return;
-      }
-      renderSignalNow(asset);
-    }
-
     function startOtcLoading(asset) {
       const loadingBox = document.getElementById("loadingBox");
       const loadingFill = document.getElementById("loadingFill");
       const loadingText = document.getElementById("loadingText");
-      const signalBox = document.getElementById("signalBox");
+      const analysisBox = document.getElementById("analysisBox");
 
-      signalBox.style.display = "none";
+      analysisBox.style.display = "none";
       loadingBox.style.display = "block";
       loadingFill.style.width = "0%";
 
@@ -1186,12 +1233,13 @@ def build_html() -> str:
 
     function renderSignalNow(asset) {
       const direction = randomDirection();
-      const signalBox = document.getElementById("signalBox");
+      const analysisBox = document.getElementById("analysisBox");
       const signalAsset = document.getElementById("signalAsset");
       const signalDirection = document.getElementById("signalDirection");
       const signalTime = document.getElementById("signalTime");
       const signalType = document.getElementById("signalType");
       const signalCommentText = document.getElementById("signalComment");
+      const signalMarketLine = document.getElementById("signalMarketLine");
 
       signalAsset.innerText = asset;
       signalDirection.innerText = direction;
@@ -1199,17 +1247,13 @@ def build_html() -> str:
       signalTime.innerText = currentTf;
       signalType.innerText = getMarketLabel();
       signalCommentText.innerText = signalComment(direction, asset, currentTf);
+      signalMarketLine.innerText = `${getMarketLabel()} • ${currentTf}`;
 
-      signalBox.style.display = "block";
-      signalBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      analysisBox.style.display = "block";
     }
 
     function generateCurrentSignal() {
-      if (!currentSelectedAsset) {
-        const marketAssets = getMarketAssets();
-        generateSignal(marketAssets[0]);
-        return;
-      }
+      if (!currentSelectedAsset) return;
 
       if (currentMarket === "otc") {
         startOtcLoading(currentSelectedAsset);
@@ -1277,21 +1321,17 @@ def build_html() -> str:
 </html>
 """
 
-
 # =========================================
 # WEB ROUTES
 # =========================================
 async def index(request: web.Request) -> web.Response:
     return web.Response(text="Chrome Trade Terminal is running", content_type="text/plain")
 
-
 async def app_page(request: web.Request) -> web.Response:
     return web.Response(text=build_html(), content_type="text/html")
 
-
 async def health(request: web.Request) -> web.Response:
     return web.json_response({"status": "ok"})
-
 
 def create_web_app() -> web.Application:
     app = web.Application()
@@ -1299,7 +1339,6 @@ def create_web_app() -> web.Application:
     app.router.add_get("/app", app_page)
     app.router.add_get("/health", health)
     return app
-
 
 # =========================================
 # STARTUP
@@ -1311,7 +1350,6 @@ async def start_web():
     site = web.TCPSite(runner, "0.0.0.0", PORT)
     await site.start()
     print(f"WEB STARTED ON PORT {PORT}")
-
 
 async def start_bot():
     if not BOT_TOKEN or BOT_TOKEN == "PASTE_YOUR_BOT_TOKEN":
@@ -1327,13 +1365,11 @@ async def start_bot():
     print("BOT STARTED")
     await dp.start_polling(bot)
 
-
 async def main():
     await asyncio.gather(
         start_web(),
         start_bot()
     )
-
 
 if __name__ == "__main__":
     asyncio.run(main())
