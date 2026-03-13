@@ -45,7 +45,8 @@ async def start_handler(message: Message):
         "Премиальный торговый mini app нового поколения внутри Telegram.\n\n"
         "⚡ Сигналы по нескольким рынкам\n"
         "📈 Встроенный анализ активов\n"
-        "🧠 Обучение и торговые стратегии\n"
+        "🧠 Большой учебный блок\n"
+        "♟ Торговые стратегии\n"
         "🛟 Поддержка внутри терминала\n\n"
         "Открой терминал и начни работу в интерфейсе уровня 2026.\n\n"
         "<b>Нажми кнопку ниже:</b>\n"
@@ -87,6 +88,7 @@ def build_html() -> str:
       --green:#7df0b2;
       --red:#ff9d9d;
       --gold:#f0d89f;
+      --blue:#9fd0ff;
       --shadow:0 14px 50px rgba(0,0,0,.35);
       --radius:22px;
     }
@@ -234,19 +236,19 @@ def build_html() -> str:
       line-height:1.14;
       margin-bottom:10px;
       color:#f8fbff;
-      max-width:360px;
+      max-width:380px;
     }
 
     .hero-text{
       color:var(--muted);
       font-size:13px;
       line-height:1.62;
-      max-width:430px;
+      max-width:440px;
     }
 
     .hero-grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns:repeat(4,1fr);
       gap:10px;
       margin-top:16px;
     }
@@ -270,7 +272,7 @@ def build_html() -> str:
     }
 
     .hero-stat-value{
-      font-size:18px;
+      font-size:17px;
       font-weight:900;
       color:#f8fbff;
     }
@@ -707,6 +709,12 @@ def build_html() -> str:
       padding:18px;
       font-size:13px;
     }
+
+    @media (max-width: 480px){
+      .hero-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
   </style>
 </head>
 <body>
@@ -730,7 +738,7 @@ def build_html() -> str:
         <div class="hero-title">Торговый терминал нового поколения внутри Telegram</div>
         <div class="hero-text">
           Современный рабочий интерфейс с сигналами, анализом, обучением и поддержкой.
-          Премиальный стиль, быстрый выбор рынков и удобная логика навигации.
+          Премиальный стартовый экран, быстрый выбор рынков и единый сигнальный flow.
         </div>
 
         <div class="hero-grid">
@@ -739,8 +747,12 @@ def build_html() -> str:
             <div class="hero-stat-value">4</div>
           </div>
           <div class="hero-stat">
-            <div class="hero-stat-label">Сигналы</div>
+            <div class="hero-stat-label">Signals</div>
             <div class="hero-stat-value">Live</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Analysis</div>
+            <div class="hero-stat-value">3 sec</div>
           </div>
           <div class="hero-stat">
             <div class="hero-stat-label">Format</div>
@@ -771,7 +783,7 @@ def build_html() -> str:
 
           <button class="menu-btn" onclick="showScreen('home')">
             <div class="menu-title">4. Торговые стратегии</div>
-            <div class="menu-desc">Раздел пока можно оставить в отдельной версии. Сейчас основной фокус — premium UX и сигнальный flow.</div>
+            <div class="menu-desc">Раздел можно расширить следующим апдейтом. Сейчас основной упор — дорогой UX и единая логика анализа.</div>
           </button>
         </div>
       </div>
@@ -800,17 +812,17 @@ def build_html() -> str:
 
           <button class="menu-btn" onclick="openMarket('official')">
             <div class="menu-title">2. Торговля Официалов</div>
-            <div class="menu-desc">Официальные валютные пары с поиском, таймфреймами и генерацией сигнала.</div>
+            <div class="menu-desc">Официальные валютные пары с поиском, таймфреймами и генерацией сигнала после 3-секундного анализа.</div>
           </button>
 
           <button class="menu-btn" onclick="openMarket('stocks')">
             <div class="menu-title">3. Торговля Акциями</div>
-            <div class="menu-desc">Популярные акции с быстрым переходом к анализу и выбором времени входа.</div>
+            <div class="menu-desc">Популярные акции с быстрым переходом к анализу и выдачей сигнала после 3 секунд загрузки.</div>
           </button>
 
           <button class="menu-btn" onclick="openMarket('crypto')">
             <div class="menu-title">4. Торговля криптовалютой</div>
-            <div class="menu-desc">Криптоактивы с поиском, таймфреймами и генерацией сигнала.</div>
+            <div class="menu-desc">Криптоактивы с поиском, таймфреймами и генерацией сигнала после 3 секунд анализа.</div>
           </button>
         </div>
 
