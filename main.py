@@ -6,9 +6,6 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 
-# =========================================
-# CONFIG
-# =========================================
 BOT_TOKEN = os.getenv("BOT_TOKEN", "7713470997:AAEvpPQK_aw5A4REz7HLPXKKWtmT-kFoSzU")
 BASE_URL = os.getenv("BASE_URL", "https://ai-trade-terminal-bot-production.up.railway.app")
 PORT = int(os.getenv("PORT", "8080"))
@@ -16,9 +13,6 @@ PORT = int(os.getenv("PORT", "8080"))
 router = Router()
 
 
-# =========================================
-# BOT KEYBOARD
-# =========================================
 def main_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -35,33 +29,22 @@ def main_keyboard() -> ReplyKeyboardMarkup:
     )
 
 
-# =========================================
-# BOT START
-# =========================================
 @router.message(CommandStart())
 async def start_handler(message: Message):
     text = (
         "💎 <b>Добро пожаловать в Chrome Trade Terminal</b>\n\n"
         "Премиальный торговый mini app нового поколения внутри Telegram.\n\n"
         "⚡ Сигналы по нескольким рынкам\n"
-        "📈 Встроенный анализ активов\n"
+        "📈 Анализ активов внутри терминала\n"
         "🧠 Большой учебный блок\n"
-        "♟ Торговые стратегии\n"
-        "🛟 Поддержка внутри терминала\n\n"
-        "Открой терминал и начни работу в интерфейсе уровня 2026.\n\n"
-        "<b>Нажми кнопку ниже:</b>\n"
+        "♟ Торговые стратегии и схемы\n"
+        "🛟 Поддержка внутри приложения\n\n"
+        "Нажми кнопку ниже и открой терминал.\n"
         "🚀 <b>Открыть терминал</b>"
     )
-    await message.answer(
-        text,
-        parse_mode="HTML",
-        reply_markup=main_keyboard()
-    )
+    await message.answer(text, parse_mode="HTML", reply_markup=main_keyboard())
 
 
-# =========================================
-# HTML TERMINAL
-# =========================================
 def build_html() -> str:
     return r"""
 <!DOCTYPE html>
@@ -74,21 +57,18 @@ def build_html() -> str:
   <style>
     :root{
       --bg:#0d0f13;
-      --bg2:#15181d;
       --card:#181c22;
       --card2:#232832;
-      --card3:#11151b;
       --line:rgba(255,255,255,.10);
       --text:#f4f7fb;
       --muted:#b4bcc8;
       --silver1:#f2f5f8;
       --silver2:#d4d9e0;
       --silver3:#a0a8b4;
-      --silver4:#7f8792;
       --green:#7df0b2;
       --red:#ff9d9d;
-      --gold:#f0d89f;
       --blue:#9fd0ff;
+      --gold:#f0d89f;
       --shadow:0 14px 50px rgba(0,0,0,.35);
       --radius:22px;
     }
@@ -193,7 +173,7 @@ def build_html() -> str:
     }
 
     .hero{
-      padding:22px 18px;
+      padding:24px 18px;
       background:
         radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 24%),
         radial-gradient(circle at bottom left, rgba(255,255,255,.05), transparent 22%),
@@ -214,6 +194,18 @@ def build_html() -> str:
       filter:blur(6px);
     }
 
+    .hero::after{
+      content:"";
+      position:absolute;
+      left:-30px;
+      bottom:-30px;
+      width:160px;
+      height:160px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.05), transparent 70%);
+      filter:blur(10px);
+    }
+
     .hero-badge{
       display:inline-flex;
       align-items:center;
@@ -231,50 +223,42 @@ def build_html() -> str:
     }
 
     .hero-title{
-      font-size:27px;
+      font-size:28px;
       font-weight:900;
-      line-height:1.14;
+      line-height:1.1;
       margin-bottom:10px;
       color:#f8fbff;
-      max-width:380px;
+      max-width:390px;
     }
 
     .hero-text{
       color:var(--muted);
       font-size:13px;
-      line-height:1.62;
-      max-width:440px;
+      line-height:1.65;
+      max-width:450px;
     }
 
-    .hero-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
+    .hero-panel{
       margin-top:16px;
-    }
-
-    .hero-stat{
-      padding:12px;
+      padding:14px;
       border-radius:18px;
       background:
         linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
-        #131821;
+        #12171f;
       border:1px solid rgba(255,255,255,.08);
     }
 
-    .hero-stat-label{
-      font-size:11px;
-      color:var(--muted);
-      margin-bottom:6px;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.35px;
+    .hero-panel-title{
+      font-size:13px;
+      font-weight:900;
+      margin-bottom:8px;
+      color:#f3f6fa;
     }
 
-    .hero-stat-value{
-      font-size:17px;
-      font-weight:900;
-      color:#f8fbff;
+    .hero-panel-text{
+      font-size:13px;
+      line-height:1.6;
+      color:var(--muted);
     }
 
     .section-title{
@@ -534,7 +518,7 @@ def build_html() -> str:
       margin-bottom:12px;
     }
 
-    .chart-card{
+    .chart-card,.scheme-card{
       margin:14px 0;
       border-radius:18px;
       padding:12px;
@@ -610,7 +594,8 @@ def build_html() -> str:
     }
 
     .support-item,
-    .lesson-box{
+    .lesson-box,
+    .strategy-box{
       padding:14px;
       border-radius:18px;
       background:#141a22;
@@ -630,7 +615,7 @@ def build_html() -> str:
       line-height:1.6;
     }
 
-    .lesson-kicker{
+    .lesson-kicker,.strategy-kicker{
       color:#d9dde3;
       font-size:11px;
       font-weight:900;
@@ -639,7 +624,7 @@ def build_html() -> str:
       text-transform:uppercase;
     }
 
-    .lesson-title{
+    .lesson-title,.strategy-title-big{
       font-size:20px;
       font-weight:900;
       margin-bottom:10px;
@@ -661,6 +646,37 @@ def build_html() -> str:
       color:#f0f4f9;
       font-size:13px;
       line-height:1.6;
+    }
+
+    .strategy-section{
+      margin-bottom:14px;
+    }
+
+    .strategy-section-title{
+      font-size:14px;
+      font-weight:900;
+      margin-bottom:6px;
+      color:#f2f5f8;
+    }
+
+    .strategy-section-text{
+      color:#dbe2ea;
+      font-size:14px;
+      line-height:1.72;
+    }
+
+    .scheme-wrap{
+      width:100%;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.06);
+      background:#0f141a;
+    }
+
+    .scheme-wrap svg{
+      width:100%;
+      height:auto;
+      display:block;
     }
 
     .bottom-tabs{
@@ -709,18 +725,11 @@ def build_html() -> str:
       padding:18px;
       font-size:13px;
     }
-
-    @media (max-width: 480px){
-      .hero-grid{
-        grid-template-columns:repeat(2,1fr);
-      }
-    }
   </style>
 </head>
 <body>
   <div class="wrap">
 
-    <!-- HOME -->
     <div id="screen-home" class="screen active">
       <div class="topbar">
         <div class="brand">
@@ -737,26 +746,15 @@ def build_html() -> str:
         <div class="hero-badge">● PREMIUM TRADING WORKSPACE</div>
         <div class="hero-title">Торговый терминал нового поколения внутри Telegram</div>
         <div class="hero-text">
-          Современный рабочий интерфейс с сигналами, анализом, обучением и поддержкой.
-          Премиальный стартовый экран, быстрый выбор рынков и единый сигнальный flow.
+          Современный рабочий интерфейс с сигналами, анализом, обучением, стратегиями и поддержкой.
+          Премиальный стартовый экран и единая логика работы внутри mini app.
         </div>
-
-        <div class="hero-grid">
-          <div class="hero-stat">
-            <div class="hero-stat-label">Markets</div>
-            <div class="hero-stat-value">4</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-label">Signals</div>
-            <div class="hero-stat-value">Live</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-label">Analysis</div>
-            <div class="hero-stat-value">3 sec</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-label">Format</div>
-            <div class="hero-stat-value">Mini App</div>
+        <div class="hero-panel">
+          <div class="hero-panel-title">Что внутри</div>
+          <div class="hero-panel-text">
+            4 рынка, быстрый выбор активов, 3-секундный анализ перед сигналом, живой демо-график,
+            большой курс по бинарным опционам, психологический блок, технический анализ,
+            smart money, японские свечи и набор логичных торговых стратегий со схемами.
           </div>
         </div>
       </div>
@@ -773,7 +771,7 @@ def build_html() -> str:
 
           <button class="menu-btn" onclick="showScreen('education-menu')">
             <div class="menu-title">2. Обучение</div>
-            <div class="menu-desc">Психология, понимание рынка и правила торговли в формате мини-курса.</div>
+            <div class="menu-desc">Большой курс: что такое бинарные опционы, психология, рынок, теханализ, свечи, индикаторы, smart money, risk management.</div>
           </button>
 
           <button class="menu-btn" onclick="showScreen('support')">
@@ -781,15 +779,14 @@ def build_html() -> str:
             <div class="menu-desc">Помощь по терминалу, ответы на частые вопросы и связь с менеджером.</div>
           </button>
 
-          <button class="menu-btn" onclick="showScreen('home')">
+          <button class="menu-btn" onclick="showScreen('strategies-menu')">
             <div class="menu-title">4. Торговые стратегии</div>
-            <div class="menu-desc">Раздел можно расширить следующим апдейтом. Сейчас основной упор — дорогой UX и единая логика анализа.</div>
+            <div class="menu-desc">10 подробно расписанных стратегий с логикой входа, фильтрами, ошибками новичков и схемами.</div>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- TRADE MENU -->
     <div id="screen-trade-menu" class="screen">
       <div class="topbar">
         <div class="brand">
@@ -830,7 +827,6 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- MARKET LIST -->
     <div id="screen-market-list" class="screen">
       <div class="topbar">
         <div class="brand">
@@ -859,7 +855,6 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- ANALYSIS -->
     <div id="screen-analysis" class="screen">
       <div class="topbar">
         <div class="brand">
@@ -922,36 +917,60 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- EDUCATION MENU -->
     <div id="screen-education-menu" class="screen">
       <div class="topbar">
         <div class="brand">
           <div class="logo">🎓</div>
           <div>
             <div class="title">Обучение</div>
-            <div class="subtitle">Мини-курс внутри терминала</div>
+            <div class="subtitle">Большой курс внутри терминала</div>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <div class="section-title">Разделы обучения</div>
-        <div class="section-sub">Изучи основу, без которой стабильная торговля невозможна.</div>
+        <div class="section-title">Разделы курса</div>
+        <div class="section-sub">Пройди учебный блок по бинарным опционам, рынку, психологии и стратегиям принятия решений.</div>
 
         <div class="menu-grid">
-          <button class="menu-btn primary" onclick="openLesson('psychology', 0)">
-            <div class="menu-title">1. Психология</div>
-            <div class="menu-desc">Эмоции, дисциплина, страх, жадность, правильное состояние перед торговлей.</div>
+          <button class="menu-btn primary" onclick="openLesson('binary', 0)">
+            <div class="menu-title">1. Что такое бинарные опционы</div>
+            <div class="menu-desc">Как работает контракт, экспирация, выплата, риски и типичные ошибки новичков.</div>
+          </button>
+
+          <button class="menu-btn" onclick="openLesson('psychology', 0)">
+            <div class="menu-title">2. Психология</div>
+            <div class="menu-desc">Страх, жадность, тильт, дисциплина, пауза после минусов и правильное состояние перед сессией.</div>
           </button>
 
           <button class="menu-btn" onclick="openLesson('market', 0)">
-            <div class="menu-title">2. Что такое рынок</div>
-            <div class="menu-desc">Импульс, откат, тренд, флет, уровни, волатильность и логика движения цены.</div>
+            <div class="menu-title">3. Что такое рынок</div>
+            <div class="menu-desc">Импульс, откат, тренд, флет, волатильность, ликвидность, уровни.</div>
           </button>
 
-          <button class="menu-btn" onclick="openLesson('rules', 0)">
-            <div class="menu-title">3. Правила торговли</div>
-            <div class="menu-desc">Когда входить, когда не входить, как фильтровать сделки и сохранять депозит.</div>
+          <button class="menu-btn" onclick="openLesson('tech', 0)">
+            <div class="menu-title">4. Технический анализ</div>
+            <div class="menu-desc">Уровни, пробои, ложные пробои, трендовые линии, структура движения.</div>
+          </button>
+
+          <button class="menu-btn" onclick="openLesson('candles', 0)">
+            <div class="menu-title">5. Японские свечи</div>
+            <div class="menu-desc">Пин-бар, поглощение, доджи, чтение тела и теней свечи в контексте рынка.</div>
+          </button>
+
+          <button class="menu-btn" onclick="openLesson('indicators', 0)">
+            <div class="menu-title">6. Индикаторы</div>
+            <div class="menu-desc">EMA, RSI, Stochastic, MACD, Bollinger, ATR и как не перегрузить график.</div>
+          </button>
+
+          <button class="menu-btn" onclick="openLesson('smartmoney', 0)">
+            <div class="menu-title">7. Smart Money</div>
+            <div class="menu-desc">Ликвидность, equal highs/lows, sweep, imbalance, displacement, order block.</div>
+          </button>
+
+          <button class="menu-btn" onclick="openLesson('risk', 0)">
+            <div class="menu-title">8. Risk Management</div>
+            <div class="menu-desc">Фиксированная сумма, остановка сессии, серия убытков, контроль рисков и поведения.</div>
           </button>
         </div>
 
@@ -959,7 +978,6 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- LESSON -->
     <div id="screen-lesson" class="screen">
       <div class="topbar">
         <div class="brand">
@@ -984,7 +1002,77 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- SUPPORT -->
+    <div id="screen-strategies-menu" class="screen">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">♟</div>
+          <div>
+            <div class="title">Торговые стратегии</div>
+            <div class="subtitle">Практические модели входа</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Выбери стратегию</div>
+        <div class="section-sub">Это обучающий раздел. Все стратегии надо применять только с фильтрацией рынка, а не механически.</div>
+        <div class="menu-grid" id="strategiesList"></div>
+        <button class="back-btn" onclick="showScreen('home')">⬅ Назад</button>
+      </div>
+    </div>
+
+    <div id="screen-strategy-detail" class="screen">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">📘</div>
+          <div>
+            <div class="title">Стратегия</div>
+            <div class="subtitle">Подробное описание и схема</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="strategy-box">
+          <div class="strategy-kicker" id="strategyKicker">Стратегия 1</div>
+          <div class="strategy-title-big" id="strategyTitleBig">Название стратегии</div>
+
+          <div class="strategy-section">
+            <div class="strategy-section-title">Суть стратегии</div>
+            <div class="strategy-section-text" id="strategyCore"></div>
+          </div>
+
+          <div class="scheme-card">
+            <div class="chart-title" style="margin-bottom:10px;">Схема</div>
+            <div class="scheme-wrap" id="strategyScheme"></div>
+          </div>
+
+          <div class="strategy-section">
+            <div class="strategy-section-title">Как искать вход</div>
+            <div class="strategy-section-text" id="strategyEntry"></div>
+          </div>
+
+          <div class="strategy-section">
+            <div class="strategy-section-title">Фильтры и подтверждения</div>
+            <div class="strategy-section-text" id="strategyFilters"></div>
+          </div>
+
+          <div class="strategy-section">
+            <div class="strategy-section-title">Главные ошибки</div>
+            <div class="strategy-section-text" id="strategyMistakes"></div>
+          </div>
+
+          <div class="strategy-section">
+            <div class="strategy-section-title">Для каких рынков и таймфреймов</div>
+            <div class="strategy-section-text" id="strategyMarkets"></div>
+          </div>
+        </div>
+
+        <button class="next-btn" id="strategyNextBtn" onclick="nextStrategy()">Следующая стратегия ➜</button>
+        <button class="back-btn" onclick="showScreen('strategies-menu')">⬅ Назад</button>
+      </div>
+    </div>
+
     <div id="screen-support" class="screen">
       <div class="topbar">
         <div class="brand">
@@ -1022,7 +1110,7 @@ def build_html() -> str:
     <div class="bottom-tabs-inner">
       <button id="tab-home" class="tab-btn active" onclick="showScreen('home')">Главная</button>
       <button id="tab-education" class="tab-btn" onclick="showScreen('education-menu')">Обучение</button>
-      <button id="tab-strategies" class="tab-btn" onclick="showScreen('home')">Стратегии</button>
+      <button id="tab-strategies" class="tab-btn" onclick="showScreen('strategies-menu')">Стратегии</button>
       <button id="tab-support" class="tab-btn" onclick="showScreen('support')">Поддержка</button>
     </div>
   </div>
@@ -1034,40 +1122,60 @@ def build_html() -> str:
     }
 
     const OTC_ASSETS = [
-      "AED/CNY",
-      "USD/BDT OTC",
-      "EUR/USD OTC",
-      "GBP/USD OTC",
-      "USD/JPY OTC",
-      "AUD/USD OTC",
-      "NZD/JPY OTC"
+      "AED/CNY","USD/BDT OTC","EUR/USD OTC","GBP/USD OTC","USD/JPY OTC","AUD/USD OTC","NZD/JPY OTC"
     ];
 
     const OFFICIAL_ASSETS = [
-      "EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD", "USD/CHF",
-      "NZD/USD", "EUR/JPY", "EUR/GBP", "EUR/CHF", "EUR/AUD", "EUR/CAD",
-      "GBP/JPY", "GBP/CHF", "GBP/AUD", "GBP/CAD", "AUD/JPY", "AUD/CAD",
-      "AUD/CHF", "CAD/JPY", "CHF/JPY", "NZD/JPY", "NZD/CAD", "NZD/CHF",
-      "EUR/NZD", "GBP/NZD", "AUD/NZD", "USD/SGD", "USD/MXN", "USD/NOK",
-      "USD/SEK", "USD/TRY", "USD/ZAR", "EUR/SEK", "EUR/NOK", "EUR/TRY"
+      "EUR/USD","GBP/USD","USD/JPY","AUD/USD","USD/CAD","USD/CHF","NZD/USD","EUR/JPY","EUR/GBP",
+      "EUR/CHF","EUR/AUD","EUR/CAD","GBP/JPY","GBP/CHF","GBP/AUD","GBP/CAD","AUD/JPY","AUD/CAD",
+      "AUD/CHF","CAD/JPY","CHF/JPY","NZD/JPY","NZD/CAD","NZD/CHF","EUR/NZD","GBP/NZD","AUD/NZD",
+      "USD/SGD","USD/MXN","USD/NOK","USD/SEK","USD/TRY","USD/ZAR","EUR/SEK","EUR/NOK","EUR/TRY"
     ];
 
     const STOCK_ASSETS = [
-      "Apple", "Tesla", "Amazon", "Google", "Meta", "Microsoft",
-      "NVIDIA", "Netflix", "Intel", "AMD", "Coca-Cola", "McDonald's",
-      "Nike", "Disney", "Boeing", "Alibaba", "Uber", "Pfizer"
+      "Apple","Tesla","Amazon","Google","Meta","Microsoft","NVIDIA","Netflix","Intel","AMD",
+      "Coca-Cola","McDonald's","Nike","Disney","Boeing","Alibaba","Uber","Pfizer"
     ];
 
     const CRYPTO_ASSETS = [
-      "Bitcoin", "Ethereum", "Litecoin", "Dash", "Chainlink",
-      "BCH/EUR", "BCH/GBP", "BCH/JPY", "BTC/GBP", "BTC/JPY",
-      "Bitcoin OTC", "Ethereum OTC", "Litecoin OTC", "Solana OTC",
-      "Polkadot OTC", "BNB OTC", "Dogecoin OTC", "Cardano OTC",
-      "Avalanche OTC", "TRON OTC", "Toncoin OTC", "Polygon OTC",
-      "Bitcoin ETF OTC"
+      "Bitcoin","Ethereum","Litecoin","Dash","Chainlink","BCH/EUR","BCH/GBP","BCH/JPY","BTC/GBP","BTC/JPY",
+      "Bitcoin OTC","Ethereum OTC","Litecoin OTC","Solana OTC","Polkadot OTC","BNB OTC","Dogecoin OTC",
+      "Cardano OTC","Avalanche OTC","TRON OTC","Toncoin OTC","Polygon OTC","Bitcoin ETF OTC"
     ];
 
     const LESSONS = {
+      binary: [
+        {
+          kicker: "Binary Options • Урок 1",
+          title: "Что такое бинарные опционы",
+          text: "Бинарный опцион — это контракт с фиксированным исходом. Ты не покупаешь сам актив, а прогнозируешь, будет ли цена выше или ниже определённого уровня к моменту экспирации. Если прогноз совпадает с итоговым результатом, платформа начисляет фиксированную выплату. Если нет — сделка закрывается в минус. Главная особенность бинарных опционов в том, что здесь важен не размер движения, а сам факт правильного направления на определённый промежуток времени.",
+          main: "Главная мысль: в бинарных опционах ты торгуешь не активом, а вероятностью правильного направления к моменту экспирации."
+        },
+        {
+          kicker: "Binary Options • Урок 2",
+          title: "Экспирация и выплата",
+          text: "Экспирация — это срок жизни сделки. Она может быть короткой, например 30 секунд, или длиннее — 1, 2, 3 минуты и больше. В бинарных опционах мало просто угадать, куда идёт цена. Нужно ещё понимать, подходит ли выбранный таймфрейм под текущую фазу рынка. Слишком короткая экспирация часто делает даже хороший анализ уязвимым к рыночному шуму.",
+          main: "Главная мысль: направление и время должны совпасть. Хорошая идея на неправильной экспирации легко ломается."
+        },
+        {
+          kicker: "Binary Options • Урок 3",
+          title: "Чем бинарные опционы отличаются от обычного трейдинга",
+          text: "В классическом трейдинге ты можешь сопровождать позицию, двигать стоп, фиксировать прибыль частями. В бинарных опционах логика жёстче: есть заранее заданный исход, фиксированный риск и фиксированный результат. Поэтому качество входа и выбор момента здесь ещё важнее, чем в обычной торговле.",
+          main: "Главная мысль: в бинарных опционах вход и тайминг критичнее, потому что гибкости управления сделкой почти нет."
+        },
+        {
+          kicker: "Binary Options • Урок 4",
+          title: "Типичные ошибки новичков",
+          text: "Новички часто думают, что бинарные опционы — это быстрый способ постоянно забирать деньги у рынка. Из-за этого они торгуют без плана, лезут в любую свечу, увеличивают сумму после минуса, пытаются отбиться и быстро сливают депозит. Проблема обычно не в кнопках выше/ниже, а в полном отсутствии системы.",
+          main: "Главная мысль: основная ошибка новичка — искать лёгкие деньги вместо дисциплины и повторяемой модели."
+        },
+        {
+          kicker: "Binary Options • Урок 5",
+          title: "Как подходить к binary options правильно",
+          text: "Нормальный подход — это не поиск волшебной схемы, а работа с вероятностями. Нужно понимать рынок, фильтровать входы, использовать понятные модели, ограничивать количество сделок и соблюдать контроль суммы. Тогда binary options превращаются не в хаос, а в дисциплинарную среду, где важны структура и качество исполнения.",
+          main: "Главная мысль: правильный подход к бинарным опционам строится на отборе ситуаций, а не на постоянной игре в угадайку."
+        }
+      ],
       psychology: [
         {
           kicker: "Психология • Урок 1",
@@ -1078,14 +1186,26 @@ def build_html() -> str:
         {
           kicker: "Психология • Урок 2",
           title: "Страх и жадность",
-          text: "Страх заставляет пропускать хорошие входы. Жадность заставляет входить без подтверждения и брать лишние сделки. Оба состояния мешают торговле, потому что в этот момент решение принимает не система, а эмоция.",
-          main: "Главная мысль: страх и жадность всегда ломают дисциплину, если ты не умеешь замечать их вовремя."
+          text: "Страх заставляет пропускать хорошие входы. Жадность заставляет входить без подтверждения и брать лишние сделки. Оба состояния ломают дисциплину и приводят к слабым решениям. Если трейдер не замечает эти состояния, он начинает торговать эмоциональным фоном, а не логикой.",
+          main: "Главная мысль: страх и жадность нельзя убрать полностью, но ими можно научиться управлять."
         },
         {
           kicker: "Психология • Урок 3",
-          title: "Почему новички сливают депозит",
-          text: "Основные причины: торговля без плана, завышенные суммы, попытка быстро отбить минус, входы без фильтра и хаотичное нажатие кнопок. Проблема не всегда в стратегии — чаще проблема в поведении самого трейдера.",
-          main: "Главная мысль: депозит чаще сливают не из-за рынка, а из-за отсутствия дисциплины."
+          title: "Тильт после минусов",
+          text: "После серии неудач у многих включается желание срочно вернуть деньги. В этот момент начинается тильт: человек открывает сделки быстрее, хуже читает рынок и отказывается от своих же правил. Это одна из самых опасных фаз. Именно в тильте сливаются депозиты, которые до этого можно было сохранить.",
+          main: "Главная мысль: после эмоционального удара не нужно ускоряться — нужно остановиться."
+        },
+        {
+          kicker: "Психология • Урок 4",
+          title: "Дисциплина важнее мотивации",
+          text: "Мотивация нестабильна: сегодня она есть, завтра её нет. Дисциплина работает иначе. Это привычка соблюдать правила даже тогда, когда не хочется. Именно дисциплина позволяет трейдеру переживать плохие дни без разрушения счёта.",
+          main: "Главная мысль: не мотивация делает систему рабочей, а дисциплина повторять правильные действия."
+        },
+        {
+          kicker: "Психология • Урок 5",
+          title: "Как мыслить сериями сделок",
+          text: "Одна сделка почти ничего не значит. Трейдинг нужно оценивать сериями: 20, 30, 50 входов. Когда человек зациклен на одной позиции, он эмоционально перегружает себя. Когда он мыслит серией, он видит статистику, а не драму одной кнопки.",
+          main: "Главная мысль: профессионал оценивает не одну сделку, а повторяемость результата на дистанции."
         }
       ],
       market: [
@@ -1098,43 +1218,259 @@ def build_html() -> str:
         {
           kicker: "Рынок • Урок 2",
           title: "Импульс и откат",
-          text: "Импульс — это сильное движение цены в одну сторону. Откат — это временное движение против основного импульса. Очень важно не путать эти два состояния, иначе можно войти в рынок в самый неудобный момент.",
-          main: "Главная мысль: не входи в конец импульса и учись видеть, где цена уже перегрета."
+          text: "Импульс — это сильное движение цены в одну сторону. Откат — это временное движение против основного импульса. Очень важно не путать эти состояния. Новички часто входят в конец импульса, когда движение уже выдохлось, и получают плохой тайминг.",
+          main: "Главная мысль: хороший вход часто появляется не в момент паники, а после оценки структуры движения."
         },
         {
           kicker: "Рынок • Урок 3",
+          title: "Тренд и флет",
+          text: "Тренд — это устойчивое направленное движение. Флет — это боковой диапазон без ярко выраженного лидера. Одни модели работают в тренде, другие во флете. Если не различать эти состояния, можно применять правильную идею в неправильной фазе рынка.",
+          main: "Главная мысль: сначала определи фазу рынка, потом ищи вход."
+        },
+        {
+          kicker: "Рынок • Урок 4",
+          title: "Волатильность",
+          text: "Волатильность — это скорость и сила движения цены. На высокой волатильности короткие экспирации становятся опаснее, потому что случайный шум растёт. На очень низкой волатильности движения может не хватить даже для хорошей идеи. Поэтому волатильность надо учитывать до входа, а не после.",
+          main: "Главная мысль: хороший сигнал без подходящей волатильности может не реализоваться."
+        },
+        {
+          kicker: "Рынок • Урок 5",
           title: "Поддержка и сопротивление",
-          text: "Поддержка — зона, где цена часто удерживается от падения. Сопротивление — зона, где цена часто удерживается от роста. Это одни из самых сильных ориентиров в торговле, потому что у уровней часто скапливается реакция рынка.",
-          main: "Главная мысль: уровни — это основа понимания, где цена может остановиться или развернуться."
+          text: "Поддержка — это зона, где продавцам становится труднее давить цену ниже. Сопротивление — область, где покупателям становится труднее продолжать рост. Эти зоны не являются магическими линиями, но они помогают понимать, где рынок может тормозить, разворачиваться или накапливать ликвидность.",
+          main: "Главная мысль: уровни — это не точка, а зона реакции цены."
         }
       ],
-      rules: [
+      tech: [
         {
-          kicker: "Правила • Урок 1",
-          title: "Не входи без причины",
-          text: "Каждая сделка должна иметь логичную причину: уровень, импульс, подтверждение, структура движения. Если причина входа звучит как 'мне кажется', значит это слабая сделка.",
-          main: "Главная мысль: хорошая сделка всегда объяснима."
+          kicker: "Технический анализ • Урок 1",
+          title: "Как читать структуру движения",
+          text: "Технический анализ начинается не с индикаторов, а с понимания структуры. Если цена делает более высокие минимумы и максимумы — рынок выглядит сильнее вверх. Если обновляются минимумы и ломаются откаты — рынок слабее. Это базовая логика, без которой любые индикаторы превращаются в декорацию.",
+          main: "Главная мысль: структура движения важнее красивых линий и стрелок."
         },
         {
-          kicker: "Правила • Урок 2",
-          title: "Не торгуй на эмоциях",
-          text: "После минуса у многих появляется желание сразу открыть следующую сделку, чтобы отбиться. Это одна из главных ошибок. Сделка после эмоции редко бывает сильной.",
-          main: "Главная мысль: эмоция не может быть основанием для входа."
+          kicker: "Технический анализ • Урок 2",
+          title: "Пробой и ложный пробой",
+          text: "Пробой — это ситуация, когда цена уверенно проходит важную зону и показывает готовность двигаться дальше. Ложный пробой — это вынос за уровень с быстрым возвратом назад. Обе модели полезны, но их нельзя путать. Именно путаница между настоящим пробоем и ложным чаще всего ломает вход.",
+          main: "Главная мысль: важен не сам факт выхода за уровень, а то, что цена делает после него."
         },
         {
-          kicker: "Правила • Урок 3",
-          title: "Лучше пропустить, чем залететь случайно",
-          text: "Пропущенная плохая сделка — это не потеря, а сохранённый депозит. Торговля строится не только на хороших входах, но и на умении отказаться от слабых.",
-          main: "Главная мысль: умение не входить — это часть профессионализма."
+          kicker: "Технический анализ • Урок 3",
+          title: "Трендовые линии",
+          text: "Трендовая линия не должна быть магической палкой. Это лишь визуальный фильтр, который помогает увидеть направление и качество откатов. Если цена уважает линию несколько раз, это усиливает идею. Но сам по себе контакт с линией без контекста ничего не гарантирует.",
+          main: "Главная мысль: трендовая линия — это помощник, а не самостоятельный грааль."
+        },
+        {
+          kicker: "Технический анализ • Урок 4",
+          title: "Консолидация и накопление",
+          text: "Когда цена сжимается и диапазон становится узким, рынок часто готовится к более сильному движению. Но консолидация не всегда означает немедленный выстрел. Нужно смотреть, куда давит рынок, сохраняется ли структура и есть ли признаки выхода одной из сторон.",
+          main: "Главная мысль: консолидация ценна тем, что готовит почву для импульса."
+        }
+      ],
+      candles: [
+        {
+          kicker: "Свечи • Урок 1",
+          title: "Тело и тени свечи",
+          text: "Тело показывает, где цена открылась и закрылась. Тени показывают, где цена была, но не смогла удержаться. Длинная тень часто указывает на борьбу и отказ от дальнейшего движения. Но отдельно от контекста свеча мало что значит.",
+          main: "Главная мысль: свеча всегда читается вместе с местом, где она появилась."
+        },
+        {
+          kicker: "Свечи • Урок 2",
+          title: "Пин-бар",
+          text: "Пин-бар — это свеча с маленьким телом и длинной тенью, которая указывает на агрессивное отклонение цены от зоны. Сильнее всего пин-бар работает на уровне поддержки или сопротивления, а не в случайном месте графика.",
+          main: "Главная мысль: хороший пин-бар — это реакция на важную область, а не просто красивая свеча."
+        },
+        {
+          kicker: "Свечи • Урок 3",
+          title: "Поглощение",
+          text: "Поглощение появляется, когда новая свеча своим телом перекрывает предыдущую и показывает смену краткосрочного баланса сил. Это часто бывает полезно после отката или у уровня. Но если рынок рваный и хаотичный, даже красивое поглощение может не отработать.",
+          main: "Главная мысль: поглощение хорошо работает в контексте, а не само по себе."
+        },
+        {
+          kicker: "Свечи • Урок 4",
+          title: "Доджи и нерешительность",
+          text: "Доджи часто показывает неопределённость и отсутствие явного лидера в моменте. На сильном уровне такая свеча может указывать на остановку движения. Но в середине слабого рынка доджи часто просто отражает шум и не даёт полезной информации.",
+          main: "Главная мысль: доджи — это не сигнал входа, а сигнал присмотреться к контексту."
+        }
+      ],
+      indicators: [
+        {
+          kicker: "Индикаторы • Урок 1",
+          title: "EMA и SMA",
+          text: "Скользящие средние помогают понимать направление и среднюю цену рынка. EMA реагирует быстрее, SMA мягче. Их можно использовать как фильтр тренда, динамическую зону отката или визуальную рамку движения.",
+          main: "Главная мысль: средние полезны как фильтр, но не должны подменять чтение рынка."
+        },
+        {
+          kicker: "Индикаторы • Урок 2",
+          title: "RSI",
+          text: "RSI показывает скорость и силу текущего движения. Многие используют его для оценки перекупленности и перепроданности, но на практике RSI лучше работает как дополнительный фильтр, а не как самостоятельная кнопка входа.",
+          main: "Главная мысль: RSI становится сильнее, когда используется вместе с уровнем и контекстом."
+        },
+        {
+          kicker: "Индикаторы • Урок 3",
+          title: "Stochastic",
+          text: "Stochastic похож по идее на RSI, но реагирует иначе и часто быстрее показывает локальное перегревание. Он может быть полезен во флете, но в мощном тренде ранние сигналы стохастика часто вводят новичка в заблуждение.",
+          main: "Главная мысль: быстрый индикатор без понимания фазы рынка даёт много ложных входов."
+        },
+        {
+          kicker: "Индикаторы • Урок 4",
+          title: "MACD, Bollinger и ATR",
+          text: "MACD помогает оценить импульс и смену темпа. Bollinger Bands позволяют видеть расширение и сжатие волатильности. ATR не показывает направление, но отлично помогает понять, насколько рынок активен. Каждый индикатор решает свою задачу, и перегружать ими график не нужно.",
+          main: "Главная мысль: индикаторы полезны только тогда, когда каждый из них отвечает за конкретную функцию."
+        }
+      ],
+      smartmoney: [
+        {
+          kicker: "Smart Money • Урок 1",
+          title: "Что трейдеры называют ликвидностью",
+          text: "Под ликвидностью в практическом трейдинге часто понимают зоны, где сконцентрированы стопы, заявки и очевидные ожидания толпы. Это могут быть equal highs, equal lows, границы диапазона, экстремумы и сильные уровни.",
+          main: "Главная мысль: цена часто идёт не туда, где всем удобно, а туда, где можно собрать ликвидность."
+        },
+        {
+          kicker: "Smart Money • Урок 2",
+          title: "Equal highs / equal lows",
+          text: "Когда на графике видны почти одинаковые вершины или почти одинаковые минимумы, многие трейдеры считают эти области зонами ликвидности. Часто рынок сначала выносит такую область, а потом показывает обратную реакцию.",
+          main: "Главная мысль: одинаковые вершины и минимумы часто становятся магнитом для цены."
+        },
+        {
+          kicker: "Smart Money • Урок 3",
+          title: "Liquidity sweep",
+          text: "Sweep — это вынос очевидной зоны с быстрым продолжением или возвратом. Он может использоваться как элемент сценария на ложный пробой или на ускорение после сбора ликвидности. Главное — не угадывать sweep заранее, а дождаться реакции после него.",
+          main: "Главная мысль: сначала должен случиться сбор ликвидности, и только потом ищется логика входа."
+        },
+        {
+          kicker: "Smart Money • Урок 4",
+          title: "Imbalance и displacement",
+          text: "Imbalance — это зона, где цена прошла слишком быстро и оставила неравномерное движение. Displacement — это сильный агрессивный импульс. Эти элементы помогают видеть, где рынок показал реальную силу одной из сторон.",
+          main: "Главная мысль: быстрые и чистые импульсы часто указывают, где рынок действительно был силён."
+        }
+      ],
+      risk: [
+        {
+          kicker: "Risk Management • Урок 1",
+          title: "Фиксированная сумма входа",
+          text: "Когда размер сделки меняется хаотично, трейдер теряет контроль над статистикой. Фиксированная сумма позволяет спокойно оценивать результат сериями, а не зависеть от одной неудачной попытки.",
+          main: "Главная мысль: контроль риска начинается с одинакового подхода к размеру сделки."
+        },
+        {
+          kicker: "Risk Management • Урок 2",
+          title: "Когда остановить сессию",
+          text: "Если у тебя несколько подряд плохих решений, это уже не просто рынок, а изменение твоего состояния. Иногда лучшая защита депозита — не найти новый вход, а закрыть терминал и вернуться позже.",
+          main: "Главная мысль: пауза — это инструмент профессионала, а не слабость."
+        },
+        {
+          kicker: "Risk Management • Урок 3",
+          title: "Не пытайся отбиться",
+          text: "Желание срочно вернуть потерянное — одна из самых дорогих эмоций в трейдинге. Оно толкает увеличивать сумму, ускорять сделки и ломать систему. Отбивание почти всегда превращает контролируемый минус в неконтролируемую серию.",
+          main: "Главная мысль: задача после убытка — не отбиться, а не потерять контроль."
+        },
+        {
+          kicker: "Risk Management • Урок 4",
+          title: "Оценивай день, а не одну сделку",
+          text: "Торговая сессия должна оцениваться по качеству решений, а не по эмоциям после одной позиции. Если ты отработал по системе, но получил случайный минус — это не трагедия. Если ты нарушил правила и случайно повезло — это тоже плохой день.",
+          main: "Главная мысль: хороший день — это день дисциплины, а не только день плюса."
         }
       ]
     };
 
+    const STRATEGIES = [
+      {
+        title: "Отбой от уровня",
+        scheme: "level",
+        core: "Стратегия строится на реакции цены от зоны поддержки или сопротивления. Ты ищешь не просто касание уровня, а сам факт замедления, отказа идти дальше, появления теней или разворотных свечей у сильной области.",
+        entry: "Сначала выделяется зона, от которой цена уже делала реакцию в прошлом. Потом ждёшь повторного подхода. Если на подходе свечи теряют силу, появляются тени, замедление или поглощение в обратную сторону, можно рассматривать вход на отбой.",
+        filters: "Лучше всего работает, когда уровень уже был проверен хотя бы один раз. Полезно, если рынок не находится в сильном новостном импульсе. Дополнительным фильтром могут быть свечные модели или слабость пробоя.",
+        mistakes: "Главная ошибка — входить просто от линии без реакции. Второй частый промах — ловить отбой против очень мощного импульса, когда рынок ещё не выдохся.",
+        markets: "ОТС, официальные валюты, крипта. Подходит для коротких и средних экспираций, если уровень читается визуально."
+      },
+      {
+        title: "Пробой уровня с подтверждением",
+        scheme: "breakout",
+        core: "Суть стратегии — работать не против уровня, а по направлению его уверенного пробоя. Хороший пробой — это не просто тень за зону, а сила, за которой стоит реальное продолжение.",
+        entry: "Находишь зону, которую рынок несколько раз не мог пройти. Затем ждёшь уверенный выход за неё. Вход возможен либо сразу после явной силы, либо после короткого возврата к зоне, если рынок не теряет импульс.",
+        filters: "Нужен чистый пробой телом, а не уколом. Дополнительный плюс — если после выхода цена не возвращается обратно сразу же. Хорошо, когда до следующего уровня есть пространство.",
+        mistakes: "Частая ошибка — прыгать в ложный пробой. Ещё одна ошибка — входить слишком поздно, когда движение уже растянуто.",
+        markets: "Лучше работает на трендовых участках официальных валют и криптовалют."
+      },
+      {
+        title: "Ложный пробой",
+        scheme: "falsebreak",
+        core: "Ложный пробой появляется, когда рынок сначала выносит очевидную зону, а потом резко возвращается назад. Часто это связано со сбором ликвидности и ловушкой для тех, кто входит слишком прямолинейно.",
+        entry: "Ищешь сильный уровень. Ждёшь вынос за него. Если после этого цена быстро возвращается назад и показывает отказ закрепляться за зоной, можно искать вход в обратную сторону.",
+        filters: "Лучше, когда возврат назад происходит быстро. Дополнительный плюс — если перед этим уровень был очевиден многим участникам рынка.",
+        mistakes: "Ошибка — угадывать ложный пробой заранее. Сначала должен случиться вынос и только потом появиться подтверждение слабости.",
+        markets: "Хорошо работает на ОТС и во флете на валютах."
+      },
+      {
+        title: "Продолжение тренда после отката",
+        scheme: "trendpullback",
+        core: "Это одна из самых логичных стратегий: не ловить разворот, а входить по направлению уже существующего движения после коррекции. Так ты работаешь вместе с доминирующей стороной.",
+        entry: "Определяешь тренд по структуре. Затем ждёшь откат против основного движения. Когда откат теряет силу и цена снова показывает готовность двигаться по тренду, ищешь вход.",
+        filters: "Лучше всего работает при понятном тренде. Подтверждение — слабые откатные свечи, реакция на уровень или возврат силы основной стороны.",
+        mistakes: "Ошибка — путать боковик с трендом. Ещё одна ошибка — входить, пока откат ещё не завершился.",
+        markets: "Сильнее всего на официальных парах и крипте."
+      },
+      {
+        title: "Флет от границ диапазона",
+        scheme: "range",
+        core: "Когда рынок не идёт направленно, а колеблется в диапазоне, можно искать входы от верхней и нижней границы. Это не стратегия для импульса, а для спокойной цикличной реакции.",
+        entry: "Определи диапазон, где цена уже несколько раз разворачивалась. У верхней границы ищи признаки слабости для входа вниз, у нижней — признаки силы для входа вверх.",
+        filters: "Важно, чтобы диапазон был визуально чистым. Длинные тени и отказ идти дальше усиливают идею. Лучше не брать такие входы, если рынок уже сжимается под явный пробой.",
+        mistakes: "Главная ошибка — считать любой боковик флэтом для торговли. Иногда это просто накопление перед сильным выходом.",
+        markets: "ОТС и спокойные валютные периоды."
+      },
+      {
+        title: "Импульс после консолидации",
+        scheme: "squeeze",
+        core: "После узкого накопления цена часто делает резкое движение. Эта стратегия работает на переходе от сжатия к расширению волатильности.",
+        entry: "Находишь участок, где диапазон узкий, свечи маленькие и рынок сжался. Потом ждёшь выход из этой зоны и работаешь в сторону силы.",
+        filters: "Хорошо, если до консолидации уже был импульс. Важен именно уверенный выход, а не случайный укол.",
+        mistakes: "Ошибка — входить в середине накопления без реального пробоя. Вторая ошибка — запрыгивать в движение, когда цена уже очень далеко ушла от зоны.",
+        markets: "Крипта и активные официальные пары."
+      },
+      {
+        title: "Свечной разворот у уровня",
+        scheme: "candle",
+        core: "Сильный уровень плюс разворотная свеча — одна из самых понятных моделей. Это может быть пин-бар, поглощение или серия свечей, показывающих отказ от продолжения движения.",
+        entry: "Цена подходит к поддержке или сопротивлению. Ты ждёшь не только касание, но и реакцию: длинную тень, резкий отказ, поглощение или сильную ответную свечу. После этого ищешь вход в сторону разворота.",
+        filters: "Свечная модель должна появляться на понятной зоне. Без контекста красивые свечи часто дают ложное ощущение сигнала.",
+        mistakes: "Ошибка — торговать любую разворотную свечу в центре хаоса без уровня и структуры.",
+        markets: "Подходит почти для всех рынков."
+      },
+      {
+        title: "EMA + трендовый откат",
+        scheme: "ema",
+        core: "EMA используется как фильтр тренда и динамическая зона отката. Смысл не в том, чтобы торговать каждое касание средней, а в том, чтобы работать по тренду, когда цена возвращается к справедливой области и снова восстанавливает движение.",
+        entry: "Определи направление по EMA. Если рынок выше средней и сохраняет структуру роста, ждёшь откат к EMA и реакцию вверх. В нисходящем сценарии — наоборот.",
+        filters: "EMA должна использоваться вместе со структурой, а не сама по себе. Подтверждением может быть слабый откат, свечная реакция или уровень рядом.",
+        mistakes: "Ошибка — думать, что средняя всегда удержит цену. На хаотичном рынке EMA часто режется без пользы.",
+        markets: "Официальные валюты и крипта."
+      },
+      {
+        title: "RSI + уровень",
+        scheme: "rsi",
+        core: "RSI лучше работает не как отдельный сигнал, а как фильтр. Если цена пришла в сильную зону и при этом RSI показывает перегрев или дивергенцию, это усиливает идею на реакцию.",
+        entry: "Сначала находишь уровень. Затем смотришь, не указывает ли RSI на перекупленность, перепроданность или расхождение с ценой. Только после этого ищешь подтверждение по самой цене.",
+        filters: "RSI должен усиливать контекст, а не заменять его. Особенно полезен во флете и на локальных выносах.",
+        mistakes: "Ошибка — входить только по RSI без уровня и подтверждения. В тренде RSI может долго оставаться в зоне перегрева.",
+        markets: "Флетовые и умеренно трендовые участки."
+      },
+      {
+        title: "Liquidity sweep + возврат",
+        scheme: "smart",
+        core: "Это smart money модель, где цена сначала снимает очевидную ликвидность, а потом показывает возврат назад. Логика в том, что после сбора стопов и заявок рынок часто даёт обратную реакцию или ускорение по новому направлению.",
+        entry: "Ищешь equal highs или equal lows, границу диапазона или очевидный экстремум. После выноса ждёшь подтверждение возврата: быструю реакцию, сильную свечу обратно, отсутствие закрепления за зоной. Затем входишь по подтверждённому возврату.",
+        filters: "Чем очевиднее ликвидная зона, тем лучше. Важна скорость возврата и отсутствие продолжения за выносом.",
+        mistakes: "Ошибка — пытаться угадать вынос до его завершения. Сначала должен быть сбор ликвидности, потом — реакция.",
+        markets: "ОТС, крипта, активные валютные сессии."
+      }
+    ];
+
     let currentMarket = "otc";
     let currentTf = "30 сек";
     let currentSelectedAsset = null;
-    let currentLessonGroup = "psychology";
+    let currentLessonGroup = "binary";
     let currentLessonIndex = 0;
+    let currentStrategyIndex = 0;
     let chartTimer = null;
 
     function setBottomTab(id) {
@@ -1150,6 +1486,7 @@ def build_html() -> str:
 
       if (name === "home") setBottomTab("home");
       if (name === "education-menu" || name === "lesson") setBottomTab("education");
+      if (name === "strategies-menu" || name === "strategy-detail") setBottomTab("strategies");
       if (name === "support") setBottomTab("support");
       if (name === "trade-menu" || name === "market-list" || name === "analysis") {
         document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
@@ -1177,25 +1514,20 @@ def build_html() -> str:
     function openMarket(type) {
       currentMarket = type;
       currentSelectedAsset = null;
-
-      const title = document.getElementById("marketTitle");
-      const sub = document.getElementById("marketSub");
-      const search = document.getElementById("assetSearch");
-
-      search.value = "";
+      document.getElementById("assetSearch").value = "";
 
       if (type === "otc") {
-        title.innerText = "Торговля ОТС";
-        sub.innerText = "Выбор OTC актива";
+        document.getElementById("marketTitle").innerText = "Торговля ОТС";
+        document.getElementById("marketSub").innerText = "Выбор OTC актива";
       } else if (type === "official") {
-        title.innerText = "Торговля Официалов";
-        sub.innerText = "Выбор официального актива";
+        document.getElementById("marketTitle").innerText = "Торговля Официалов";
+        document.getElementById("marketSub").innerText = "Выбор официального актива";
       } else if (type === "stocks") {
-        title.innerText = "Торговля Акциями";
-        sub.innerText = "Выбор акции";
+        document.getElementById("marketTitle").innerText = "Торговля Акциями";
+        document.getElementById("marketSub").innerText = "Выбор акции";
       } else {
-        title.innerText = "Торговля криптовалютой";
-        sub.innerText = "Выбор криптоактива";
+        document.getElementById("marketTitle").innerText = "Торговля криптовалютой";
+        document.getElementById("marketSub").innerText = "Выбор криптоактива";
       }
 
       showScreen("market-list");
@@ -1212,9 +1544,7 @@ def build_html() -> str:
     function renderAssets() {
       const list = document.getElementById("assetList");
       const searchValue = document.getElementById("assetSearch").value.toLowerCase().trim();
-      const marketAssets = getMarketAssets();
-      const filtered = marketAssets.filter(a => a.toLowerCase().includes(searchValue));
-
+      const filtered = getMarketAssets().filter(a => a.toLowerCase().includes(searchValue));
       list.innerHTML = "";
 
       if (!filtered.length) {
@@ -1239,17 +1569,10 @@ def build_html() -> str:
 
     function openAnalysis(asset) {
       currentSelectedAsset = asset;
-
-      const loadingBox = document.getElementById("loadingBox");
-      const analysisBox = document.getElementById("analysisBox");
-      const loadingFill = document.getElementById("loadingFill");
-      const loadingText = document.getElementById("loadingText");
-
-      loadingBox.style.display = "none";
-      analysisBox.style.display = "none";
-      loadingFill.style.width = "0%";
-      loadingText.innerText = "Подготавливаем торговый сигнал";
-
+      document.getElementById("loadingBox").style.display = "none";
+      document.getElementById("analysisBox").style.display = "none";
+      document.getElementById("loadingFill").style.width = "0%";
+      document.getElementById("loadingText").innerText = "Подготавливаем торговый сигнал";
       showScreen("analysis");
       startSignalLoading(asset);
     }
@@ -1268,17 +1591,17 @@ def build_html() -> str:
     }
 
     function signalComment(direction, asset, tf, strength) {
-      const textUp = [
+      const up = [
         `Сценарий по активу ${asset} указывает на возможное движение вверх. Расчётная сила сигнала — ${strength}%. Рабочий интервал — ${tf}.`,
         `По активу ${asset} сохраняется приоритет движения вверх. Сигнал оценивается как ${strength}% и подходит под таймфрейм ${tf}.`,
         `На ${asset} зафиксирован сценарий на движение вверх. Сила модели — ${strength}%, рабочее окно входа — ${tf}.`
       ];
-      const textDown = [
+      const down = [
         `Сценарий по активу ${asset} указывает на возможное движение вниз. Расчётная сила сигнала — ${strength}%. Рабочий интервал — ${tf}.`,
         `По активу ${asset} сохраняется приоритет движения вниз. Сигнал оценивается как ${strength}% и подходит под таймфрейм ${tf}.`,
         `На ${asset} зафиксирован сценарий на движение вниз. Сила модели — ${strength}%, рабочее окно входа — ${tf}.`
       ];
-      const arr = direction === "ВВЕРХ" ? textUp : textDown;
+      const arr = direction === "ВВЕРХ" ? up : down;
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
@@ -1333,25 +1656,17 @@ def build_html() -> str:
     function renderSignalNow(asset) {
       const direction = randomDirection();
       const strength = randomStrength();
-      const analysisBox = document.getElementById("analysisBox");
-      const signalAsset = document.getElementById("signalAsset");
-      const signalDirection = document.getElementById("signalDirection");
-      const signalTime = document.getElementById("signalTime");
-      const signalType = document.getElementById("signalType");
-      const signalCommentText = document.getElementById("signalComment");
-      const signalMarketLine = document.getElementById("signalMarketLine");
-      const signalStrength = document.getElementById("signalStrength");
 
-      signalAsset.innerText = asset;
-      signalDirection.innerText = direction;
-      signalDirection.className = "chip " + (direction === "ВВЕРХ" ? "dir-up" : "dir-down");
-      signalTime.innerText = currentTf;
-      signalType.innerText = getMarketLabel();
-      signalCommentText.innerText = signalComment(direction, asset, currentTf, strength);
-      signalMarketLine.innerText = `${getMarketLabel()} • ${currentTf}`;
-      signalStrength.innerText = `${strength}%`;
+      document.getElementById("signalAsset").innerText = asset;
+      document.getElementById("signalDirection").innerText = direction;
+      document.getElementById("signalDirection").className = "chip " + (direction === "ВВЕРХ" ? "dir-up" : "dir-down");
+      document.getElementById("signalTime").innerText = currentTf;
+      document.getElementById("signalType").innerText = getMarketLabel();
+      document.getElementById("signalComment").innerText = signalComment(direction, asset, currentTf, strength);
+      document.getElementById("signalMarketLine").innerText = `${getMarketLabel()} • ${currentTf}`;
+      document.getElementById("signalStrength").innerText = `${strength}%`;
 
-      analysisBox.style.display = "block";
+      document.getElementById("analysisBox").style.display = "block";
       startChart(direction);
     }
 
@@ -1362,7 +1677,6 @@ def build_html() -> str:
 
     function startChart(direction) {
       stopChart();
-
       const canvas = document.getElementById("liveChart");
       if (!canvas) return;
 
@@ -1390,7 +1704,6 @@ def build_html() -> str:
         for (let i = 0; i < 6; i++) {
           const y = (H / 6) * i;
           ctx.strokeStyle = "rgba(255,255,255,0.06)";
-          ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(0, y);
           ctx.lineTo(W, y);
@@ -1400,7 +1713,6 @@ def build_html() -> str:
         for (let i = 0; i < 8; i++) {
           const x = (W / 8) * i;
           ctx.strokeStyle = "rgba(255,255,255,0.04)";
-          ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(x, 0);
           ctx.lineTo(x, H);
@@ -1475,36 +1787,27 @@ def build_html() -> str:
 
     function renderLesson() {
       const lesson = LESSONS[currentLessonGroup][currentLessonIndex];
+      const names = {
+        binary: ["Что такое бинарные опционы", "Базовая механика и риски"],
+        psychology: ["Психология", "Контроль эмоций и дисциплина"],
+        market: ["Что такое рынок", "Понимание структуры движения цены"],
+        tech: ["Технический анализ", "Структура, уровни, пробои"],
+        candles: ["Японские свечи", "Свечные модели и контекст"],
+        indicators: ["Индикаторы", "EMA, RSI, MACD и фильтры"],
+        smartmoney: ["Smart Money", "Ликвидность и выносы"],
+        risk: ["Risk Management", "Защита депозита и контроль сессии"]
+      };
 
-      const categoryTitle = document.getElementById("lessonCategoryTitle");
-      const categorySub = document.getElementById("lessonCategorySub");
-      const kicker = document.getElementById("lessonKicker");
-      const title = document.getElementById("lessonTitle");
-      const text = document.getElementById("lessonText");
-      const main = document.getElementById("lessonMain");
-      const nextBtn = document.getElementById("lessonNextBtn");
+      document.getElementById("lessonCategoryTitle").innerText = names[currentLessonGroup][0];
+      document.getElementById("lessonCategorySub").innerText = names[currentLessonGroup][1];
+      document.getElementById("lessonKicker").innerText = lesson.kicker;
+      document.getElementById("lessonTitle").innerText = lesson.title;
+      document.getElementById("lessonText").innerText = lesson.text;
+      document.getElementById("lessonMain").innerText = lesson.main;
 
-      if (currentLessonGroup === "psychology") {
-        categoryTitle.innerText = "Психология";
-        categorySub.innerText = "Контроль эмоций и дисциплина";
-      } else if (currentLessonGroup === "market") {
-        categoryTitle.innerText = "Что такое рынок";
-        categorySub.innerText = "Понимание структуры движения цены";
-      } else {
-        categoryTitle.innerText = "Правила торговли";
-        categorySub.innerText = "Фильтрация входов и защита депозита";
-      }
-
-      kicker.innerText = lesson.kicker;
-      title.innerText = lesson.title;
-      text.innerText = lesson.text;
-      main.innerText = lesson.main;
-
-      if (currentLessonIndex >= LESSONS[currentLessonGroup].length - 1) {
-        nextBtn.innerText = "Вернуться в обучение";
-      } else {
-        nextBtn.innerText = "Следующий урок ➜";
-      }
+      const lessons = LESSONS[currentLessonGroup];
+      document.getElementById("lessonNextBtn").innerText =
+        currentLessonIndex >= lessons.length - 1 ? "Вернуться в обучение" : "Следующий урок ➜";
     }
 
     function nextLesson() {
@@ -1520,22 +1823,178 @@ def build_html() -> str:
     function backFromLesson() {
       showScreen("education-menu");
     }
+
+    function renderStrategiesList() {
+      const list = document.getElementById("strategiesList");
+      list.innerHTML = "";
+      STRATEGIES.forEach((s, i) => {
+        const btn = document.createElement("button");
+        btn.className = i === 0 ? "menu-btn primary" : "menu-btn";
+        btn.innerHTML = `
+          <div class="menu-title">${i + 1}. ${s.title}</div>
+          <div class="menu-desc">${s.core.slice(0, 170)}...</div>
+        `;
+        btn.onclick = () => openStrategy(i);
+        list.appendChild(btn);
+      });
+    }
+
+    function openStrategy(index) {
+      currentStrategyIndex = index;
+      renderStrategy();
+      showScreen("strategy-detail");
+    }
+
+    function nextStrategy() {
+      if (currentStrategyIndex >= STRATEGIES.length - 1) {
+        showScreen("strategies-menu");
+        return;
+      }
+      currentStrategyIndex += 1;
+      renderStrategy();
+    }
+
+    function renderStrategy() {
+      const s = STRATEGIES[currentStrategyIndex];
+      document.getElementById("strategyKicker").innerText = `Стратегия ${currentStrategyIndex + 1} из ${STRATEGIES.length}`;
+      document.getElementById("strategyTitleBig").innerText = s.title;
+      document.getElementById("strategyCore").innerText = s.core;
+      document.getElementById("strategyEntry").innerText = s.entry;
+      document.getElementById("strategyFilters").innerText = s.filters;
+      document.getElementById("strategyMistakes").innerText = s.mistakes;
+      document.getElementById("strategyMarkets").innerText = s.markets;
+      document.getElementById("strategyScheme").innerHTML = getSchemeSvg(s.scheme);
+
+      document.getElementById("strategyNextBtn").innerText =
+        currentStrategyIndex >= STRATEGIES.length - 1 ? "Вернуться к списку стратегий" : "Следующая стратегия ➜";
+    }
+
+    function getSchemeSvg(type) {
+      const commonTop = `<svg viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg">
+        <rect width="600" height="260" fill="#0f141a"/>
+        <g stroke="rgba(255,255,255,.06)">
+          <line x1="0" y1="40" x2="600" y2="40"/>
+          <line x1="0" y1="90" x2="600" y2="90"/>
+          <line x1="0" y1="140" x2="600" y2="140"/>
+          <line x1="0" y1="190" x2="600" y2="190"/>
+          <line x1="80" y1="0" x2="80" y2="260"/>
+          <line x1="160" y1="0" x2="160" y2="260"/>
+          <line x1="240" y1="0" x2="240" y2="260"/>
+          <line x1="320" y1="0" x2="320" y2="260"/>
+          <line x1="400" y1="0" x2="400" y2="260"/>
+          <line x1="480" y1="0" x2="480" y2="260"/>
+        </g>`;
+
+      if (type === "level") {
+        return commonTop + `
+          <line x1="40" y1="120" x2="560" y2="120" stroke="#9fd0ff" stroke-width="3" stroke-dasharray="8 8"/>
+          <polyline points="60,70 110,85 160,95 210,110 260,118 300,150 345,135 390,122 440,98 500,88 550,80"
+            fill="none" stroke="#7df0b2" stroke-width="4"/>
+          <text x="365" y="112" fill="#f2f5f8" font-size="16" font-weight="700">Отбой от уровня</text>
+          <circle cx="300" cy="150" r="6" fill="#ff9d9d"/>
+        </svg>`;
+      }
+
+      if (type === "breakout") {
+        return commonTop + `
+          <line x1="40" y1="140" x2="560" y2="140" stroke="#9fd0ff" stroke-width="3" stroke-dasharray="8 8"/>
+          <polyline points="50,150 100,148 150,145 200,147 250,144 300,146 350,130 400,95 460,78 520,60"
+            fill="none" stroke="#7df0b2" stroke-width="4"/>
+          <text x="350" y="130" fill="#f2f5f8" font-size="16" font-weight="700">Пробой</text>
+        </svg>`;
+      }
+
+      if (type === "falsebreak") {
+        return commonTop + `
+          <line x1="40" y1="120" x2="560" y2="120" stroke="#9fd0ff" stroke-width="3" stroke-dasharray="8 8"/>
+          <polyline points="60,95 120,100 180,108 240,116 300,125 340,105 380,140 430,150 490,145 550,138"
+            fill="none" stroke="#ff9d9d" stroke-width="4"/>
+          <text x="350" y="98" fill="#f2f5f8" font-size="16" font-weight="700">Ложный пробой</text>
+        </svg>`;
+      }
+
+      if (type === "trendpullback") {
+        return commonTop + `
+          <polyline points="50,190 100,170 150,160 200,145 250,135 300,150 350,140 400,115 460,100 530,78"
+            fill="none" stroke="#7df0b2" stroke-width="4"/>
+          <line x1="40" y1="178" x2="560" y2="90" stroke="#9fd0ff" stroke-width="2" stroke-dasharray="10 8"/>
+          <text x="315" y="160" fill="#f2f5f8" font-size="16" font-weight="700">Откат по тренду</text>
+        </svg>`;
+      }
+
+      if (type === "range") {
+        return commonTop + `
+          <line x1="40" y1="70" x2="560" y2="70" stroke="#9fd0ff" stroke-width="3" stroke-dasharray="8 8"/>
+          <line x1="40" y1="180" x2="560" y2="180" stroke="#9fd0ff" stroke-width="3" stroke-dasharray="8 8"/>
+          <polyline points="60,170 110,120 160,95 210,150 260,175 310,130 360,88 420,150 470,175 530,125"
+            fill="none" stroke="#f0d89f" stroke-width="4"/>
+          <text x="390" y="63" fill="#f2f5f8" font-size="16" font-weight="700">Флет</text>
+        </svg>`;
+      }
+
+      if (type === "squeeze") {
+        return commonTop + `
+          <polyline points="60,145 110,143 160,141 210,139 260,138 300,137 340,120 390,92 450,70 520,55"
+            fill="none" stroke="#7df0b2" stroke-width="4"/>
+          <path d="M70 155 L280 130" stroke="#9fd0ff" stroke-width="2"/>
+          <path d="M70 120 L280 130" stroke="#9fd0ff" stroke-width="2"/>
+          <text x="300" y="118" fill="#f2f5f8" font-size="16" font-weight="700">Выход из сжатия</text>
+        </svg>`;
+      }
+
+      if (type === "candle") {
+        return commonTop + `
+          <line x1="40" y1="150" x2="560" y2="150" stroke="#9fd0ff" stroke-width="3" stroke-dasharray="8 8"/>
+          <rect x="245" y="112" width="28" height="36" fill="#ff9d9d"/>
+          <line x1="259" y1="75" x2="259" y2="178" stroke="#f2f5f8" stroke-width="3"/>
+          <rect x="310" y="145" width="28" height="18" fill="#7df0b2"/>
+          <line x1="324" y1="118" x2="324" y2="176" stroke="#f2f5f8" stroke-width="3"/>
+          <text x="350" y="135" fill="#f2f5f8" font-size="16" font-weight="700">Свечной разворот</text>
+        </svg>`;
+      }
+
+      if (type === "ema") {
+        return commonTop + `
+          <path d="M40 175 C120 160, 160 150, 220 145 S340 135, 400 118 S500 95, 560 85" stroke="#7df0b2" stroke-width="4" fill="none"/>
+          <path d="M40 185 C120 178, 180 165, 240 154 S360 138, 420 126 S510 105, 560 96" stroke="#f0d89f" stroke-width="3" fill="none"/>
+          <text x="390" y="120" fill="#f2f5f8" font-size="16" font-weight="700">EMA + откат</text>
+        </svg>`;
+      }
+
+      if (type === "rsi") {
+        return commonTop + `
+          <line x1="40" y1="125" x2="560" y2="125" stroke="#9fd0ff" stroke-width="3" stroke-dasharray="8 8"/>
+          <polyline points="60,95 120,105 180,115 240,130 300,145 360,138 420,120 480,98 540,88"
+            fill="none" stroke="#f0d89f" stroke-width="4"/>
+          <text x="355" y="150" fill="#f2f5f8" font-size="16" font-weight="700">RSI + уровень</text>
+        </svg>`;
+      }
+
+      return commonTop + `
+        <line x1="40" y1="115" x2="560" y2="115" stroke="#9fd0ff" stroke-width="3" stroke-dasharray="8 8"/>
+        <polyline points="60,120 120,118 180,117 240,116 300,105 350,125 400,145 470,120 540,98"
+          fill="none" stroke="#ff9d9d" stroke-width="4"/>
+        <text x="335" y="98" fill="#f2f5f8" font-size="16" font-weight="700">Liquidity sweep</text>
+      </svg>`;
+    }
+
+    renderStrategiesList();
   </script>
 </body>
 </html>
 """
 
-# =========================================
-# WEB ROUTES
-# =========================================
 async def index(request: web.Request) -> web.Response:
     return web.Response(text="Chrome Trade Terminal is running", content_type="text/plain")
+
 
 async def app_page(request: web.Request) -> web.Response:
     return web.Response(text=build_html(), content_type="text/html")
 
+
 async def health(request: web.Request) -> web.Response:
     return web.json_response({"status": "ok"})
+
 
 def create_web_app() -> web.Application:
     app = web.Application()
@@ -1544,9 +2003,7 @@ def create_web_app() -> web.Application:
     app.router.add_get("/health", health)
     return app
 
-# =========================================
-# STARTUP
-# =========================================
+
 async def start_web():
     app = create_web_app()
     runner = web.AppRunner(app)
@@ -1555,11 +2012,12 @@ async def start_web():
     await site.start()
     print(f"WEB STARTED ON PORT {PORT}")
 
+
 async def start_bot():
     if not BOT_TOKEN or BOT_TOKEN == "PASTE_YOUR_BOT_TOKEN":
-        raise RuntimeError("Укажи BOT_TOKEN")
+      raise RuntimeError("Укажи BOT_TOKEN")
     if not BASE_URL or BASE_URL == "https://your-domain.up.railway.app":
-        raise RuntimeError("Укажи BASE_URL")
+      raise RuntimeError("Укажи BASE_URL")
 
     bot = Bot(BOT_TOKEN)
     dp = Dispatcher()
@@ -1569,11 +2027,13 @@ async def start_bot():
     print("BOT STARTED")
     await dp.start_polling(bot)
 
+
 async def main():
     await asyncio.gather(
         start_web(),
         start_bot()
     )
+
 
 if __name__ == "__main__":
     asyncio.run(main())
