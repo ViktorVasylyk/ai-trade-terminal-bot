@@ -24,7 +24,7 @@ from aiogram.types import (
 )
 
 # ================== ENV / SETTINGS ==================
-BOT_TOKEN = os.getenv("BOT_TOKEN", "7713470997:AAG0jqwe0fiYb1Qn-lSRVvvgrePcuAyeZ4M")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "7713470997:AAF9CvWqHfjnU994P6X_BubuPZ12lTlojNE")
 BASE_URL = os.getenv("BASE_URL", "https://your-domain.up.railway.app")
 PORT = int(os.getenv("PORT", "8080"))
 
