@@ -1,12 +1,10 @@
 import asyncio
 import hashlib
-import hmac
 import json
 import os
 import random
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
-from urllib.parse import parse_qsl
 
 import httpx
 from aiohttp import web
@@ -25,7 +23,7 @@ from aiogram.types import (
 
 # ================== ENV / SETTINGS ==================
 BOT_TOKEN = os.getenv("BOT_TOKEN", "7713470997:AAF9CvWqHfjnU994P6X_BubuPZ12lTlojNE")
-BASE_URL = os.getenv("BASE_URL", "https://your-domain.up.railway.app")
+BASE_URL = os.getenv("BASE_URL", "https://ai-trade-terminal-bot-production.up.railway.app")
 PORT = int(os.getenv("PORT", "8080"))
 
 PARTNER_ID = os.getenv("PARTNER_ID", "51641")
@@ -36,76 +34,12 @@ REVIEWS_GROUP_LINK = os.getenv("REVIEWS_GROUP_LINK", "https://t.me/+6jtb0MDtb_A0
 
 BASE_DIR = Path(__file__).resolve().parent
 BANNER_PATH = BASE_DIR / "vip_banner.png"
-ALLOWED_USERS_FILE = BASE_DIR / "allowed_users.json"
 
 AUTO_CHECK_EVERY_SEC = 10 * 60
 AUTO_CHECK_TOTAL_SEC = 3 * 60 * 60
 AUTO_CHECK_MAX_RUNS = max(1, AUTO_CHECK_TOTAL_SEC // AUTO_CHECK_EVERY_SEC)
 
 router = Router()
-
-# ================== ACCESS STORAGE ==================
-def load_allowed_users() -> set[int]:
-    if not ALLOWED_USERS_FILE.exists():
-        return set()
-    try:
-        data = json.loads(ALLOWED_USERS_FILE.read_text(encoding="utf-8"))
-        return {int(x) for x in data}
-    except Exception:
-        return set()
-
-
-def save_allowed_users(users: set[int]) -> None:
-    ALLOWED_USERS_FILE.write_text(
-        json.dumps(sorted(list(users)), ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-
-
-def allow_user(user_id: int) -> None:
-    users = load_allowed_users()
-    users.add(int(user_id))
-    save_allowed_users(users)
-
-
-def is_user_allowed(user_id: int) -> bool:
-    return int(user_id) in load_allowed_users()
-
-
-def verify_telegram_init_data(init_data: str, bot_token: str) -> Optional[dict]:
-    if not init_data:
-        return None
-
-    pairs = dict(parse_qsl(init_data, keep_blank_values=True))
-    received_hash = pairs.pop("hash", None)
-    if not received_hash:
-        return None
-
-    data_check_string = "\n".join(f"{k}={v}" for k, v in sorted(pairs.items()))
-    secret_key = hmac.new(
-        b"WebAppData",
-        bot_token.encode("utf-8"),
-        hashlib.sha256,
-    ).digest()
-
-    calculated_hash = hmac.new(
-        secret_key,
-        data_check_string.encode("utf-8"),
-        hashlib.sha256,
-    ).hexdigest()
-
-    if calculated_hash != received_hash:
-        return None
-
-    user_raw = pairs.get("user")
-    if not user_raw:
-        return None
-
-    try:
-        return json.loads(user_raw)
-    except Exception:
-        return None
-
 
 # ================== TEXTS ==================
 VIP_CAPTION = (
@@ -138,6 +72,7 @@ BOT_ACCESS_TEXT = (
 )
 
 
+
 def make_recruit_text() -> str:
     online = random.randint(120, 210)
     left_slots = random.randint(3, 9)
@@ -158,13 +93,13 @@ def terminal_keyboard() -> ReplyKeyboardMarkup:
             [
                 KeyboardButton(
                     text="🚀 Открыть терминал",
-                    web_app=WebAppInfo(url=f"{BASE_URL}/app"),
+                    web_app=WebAppInfo(url=f"{BASE_URL}/app")
                 )
             ]
         ],
         resize_keyboard=True,
         one_time_keyboard=False,
-        input_field_placeholder="Нажми кнопку, чтобы открыть терминал",
+        input_field_placeholder="Нажми кнопку, чтобы открыть терминал"
     )
 
 
@@ -308,8 +243,9 @@ WAITING_ID = set()
 
 
 async def send_terminal_access(message: Message):
+    await message.answer(BOT_ACCESS_TEXT, parse_mode="HTML")
     await message.answer(
-        BOT_ACCESS_TEXT,
+        "💎 <b>Доступ открыт</b>\n\nНажми кнопку ниже, чтобы открыть торговый терминал.",
         parse_mode="HTML",
         reply_markup=terminal_keyboard(),
     )
@@ -332,16 +268,12 @@ async def auto_check_loop(tg_id: int, trader_id: str, chat_id: int, bot: Bot):
             if "_http_status" not in data:
                 is_reg, is_ftd = parse_status(data)
                 if is_reg and is_ftd:
-                    allow_user(tg_id)
                     PENDING.pop(tg_id, None)
+                    await bot.send_message(chat_id, "✅ <b>FTD подтвержден!</b>\n🔥 Доступ активирован 🚀", parse_mode="HTML")
+                    await bot.send_message(chat_id, BOT_ACCESS_TEXT, parse_mode="HTML")
                     await bot.send_message(
                         chat_id,
-                        "✅ <b>FTD подтвержден!</b>\n🔥 Доступ активирован 🚀",
-                        parse_mode="HTML",
-                    )
-                    await bot.send_message(
-                        chat_id,
-                        BOT_ACCESS_TEXT,
+                        "💎 <b>Терминал готов к работе</b>\n\nНажми кнопку ниже:",
                         parse_mode="HTML",
                         reply_markup=terminal_keyboard(),
                     )
@@ -362,7 +294,7 @@ async def auto_check_loop(tg_id: int, trader_id: str, chat_id: int, bot: Bot):
             "⏳ Я проверял FTD автоматически, но депозит ещё не отобразился.\n\n"
             "Если депозит уже сделал — нажми кнопку и скинь ID ещё раз ✅",
             parse_mode="HTML",
-            reply_markup=deposit_check_kb(),
+            reply_markup=deposit_check_kb()
         )
     except Exception:
         pass
@@ -379,7 +311,7 @@ def start_or_refresh_auto_check(tg_id: int, trader_id: str, chat_id: int, bot: B
         "task": task,
         "trader_id": trader_id,
         "chat_id": chat_id,
-        "runs_left": AUTO_CHECK_MAX_RUNS,
+        "runs_left": AUTO_CHECK_MAX_RUNS
     }
 
 
@@ -409,50 +341,16 @@ def looks_like_id(text: str) -> bool:
 # ================== BOT HANDLERS ==================
 @router.message(Command("start"))
 async def start_handler(message: Message):
-    if is_user_allowed(message.from_user.id):
-        await message.answer(
-            "💎 <b>Доступ уже открыт</b>\n\n"
-            "Нажми кнопку ниже, чтобы открыть торговый терминал.",
-            parse_mode="HTML",
-            reply_markup=terminal_keyboard(),
-        )
-        return
-
-    await message.answer(
-        make_recruit_text(),
-        parse_mode="HTML",
-        reply_markup=kb_want_team(),
-    )
+    await message.answer(make_recruit_text(), parse_mode="HTML", reply_markup=kb_want_team())
 
 
 @router.message(Command("strat"))
 async def strat_handler(message: Message):
-    if is_user_allowed(message.from_user.id):
-        await message.answer(
-            "💎 <b>Доступ уже открыт</b>\n\n"
-            "Нажми кнопку ниже, чтобы открыть торговый терминал.",
-            parse_mode="HTML",
-            reply_markup=terminal_keyboard(),
-        )
-        return
-
-    await message.answer(
-        make_recruit_text(),
-        parse_mode="HTML",
-        reply_markup=kb_want_team(),
-    )
+    await message.answer(make_recruit_text(), parse_mode="HTML", reply_markup=kb_want_team())
 
 
 @router.message(Command("terminal"))
 async def terminal_handler(message: Message):
-    if not is_user_allowed(message.from_user.id):
-        await message.answer(
-            "⛔ <b>Доступ закрыт</b>\n\n"
-            "Сначала пройди регистрацию и FTD.",
-            parse_mode="HTML",
-        )
-        return
-
     await message.answer(
         "🚀 <b>Открытие терминала</b>",
         parse_mode="HTML",
@@ -543,22 +441,19 @@ async def catch_id_message(message: Message):
 
         if not is_reg:
             await wait_msg.edit_text(
-                "❌ <b>ID не найдено</b>\n\n"
-                "Проверь правильность ID.\n"
-                "Важно: аккаунт должен быть зарегистрирован по моей ссылке ✅",
+                "❌ <b>Не найдено</b>\n\n"
+                "Проверь, правильный ли ID.\n"
+                "Если ты только что зарегистрировался — подожди 2-5 минут и отправь ID снова ✅",
                 parse_mode="HTML",
             )
             return
 
         if is_ftd:
-            allow_user(message.from_user.id)
-
             await wait_msg.edit_text(
                 "✅ <b>FTD подтвержден</b>\n\n"
                 "🔥 Доступ активирован. Добро пожаловать в VIP 🚀",
                 parse_mode="HTML",
             )
-
             if message.from_user.id in PENDING:
                 PENDING.pop(message.from_user.id, None)
 
@@ -1270,25 +1165,6 @@ def build_html() -> str:
   </style>
 </head>
 <body>
-  <div id="access-overlay" style="
-    position:fixed;
-    inset:0;
-    z-index:99999;
-    background:#0b0d11;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:24px;
-    font-family:Arial,sans-serif;
-  ">
-    <div>
-      <div style="font-size:22px;font-weight:700;margin-bottom:12px;">Проверка доступа...</div>
-      <div style="font-size:14px;opacity:.8;">Подожди пару секунд</div>
-    </div>
-  </div>
-
   <div class="wrap">
 
     <div id="screen-home" class="screen active">
@@ -1677,6 +1553,11 @@ def build_html() -> str:
   </div>
 
   <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+    }
+
     const OTC_ASSETS = [
       "AED/CNY","USD/BDT OTC","EUR/USD OTC","GBP/USD OTC","USD/JPY OTC","AUD/USD OTC","NZD/JPY OTC"
     ];
@@ -2534,57 +2415,7 @@ def build_html() -> str:
       </svg>`;
     }
 
-    function initUI() {
-      renderStrategiesList();
-    }
-
-    async function verifyAccess() {
-      try {
-        if (!window.Telegram || !window.Telegram.WebApp) {
-          document.getElementById("access-overlay").innerHTML = `
-            <div>
-              <div style="font-size:22px;font-weight:700;margin-bottom:12px;">Доступ запрещён</div>
-              <div style="font-size:14px;opacity:.8;">Открой терминал только через Telegram-бота</div>
-            </div>
-          `;
-          return;
-        }
-
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-
-        const resp = await fetch("/auth/check", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ init_data: tg.initData || "" })
-        });
-
-        const data = await resp.json();
-
-        if (resp.ok && data.ok) {
-          const overlay = document.getElementById("access-overlay");
-          if (overlay) overlay.style.display = "none";
-          initUI();
-        } else {
-          document.getElementById("access-overlay").innerHTML = `
-            <div>
-              <div style="font-size:22px;font-weight:700;margin-bottom:12px;">Доступ запрещён</div>
-              <div style="font-size:14px;opacity:.8;">Сначала пройди регистрацию и FTD</div>
-            </div>
-          `;
-        }
-      } catch (e) {
-        document.getElementById("access-overlay").innerHTML = `
-          <div>
-            <div style="font-size:22px;font-weight:700;margin-bottom:12px;">Ошибка доступа</div>
-            <div style="font-size:14px;opacity:.8;">Попробуй открыть терминал снова через бота</div>
-          </div>
-        `;
-      }
-    }
-
-    verifyAccess();
+    renderStrategiesList();
   </script>
 </body>
 </html>
@@ -2592,25 +2423,6 @@ def build_html() -> str:
 
 
 # ================== WEB ROUTES ==================
-async def auth_check(request: web.Request) -> web.Response:
-    try:
-        data = await request.json()
-    except Exception:
-        return web.json_response({"ok": False, "error": "bad_json"}, status=400)
-
-    init_data = data.get("init_data", "")
-    user = verify_telegram_init_data(init_data, BOT_TOKEN)
-
-    if not user:
-        return web.json_response({"ok": False, "error": "unauthorized"}, status=403)
-
-    user_id = user.get("id")
-    if not user_id or not is_user_allowed(int(user_id)):
-        return web.json_response({"ok": False, "error": "access_denied"}, status=403)
-
-    return web.json_response({"ok": True})
-
-
 async def index(request: web.Request) -> web.Response:
     return web.Response(text="Chrome Trade Terminal is running", content_type="text/plain")
 
@@ -2628,7 +2440,6 @@ def create_web_app() -> web.Application:
     app.router.add_get("/", index)
     app.router.add_get("/app", app_page)
     app.router.add_get("/health", health)
-    app.router.add_post("/auth/check", auth_check)
     return app
 
 
@@ -2663,7 +2474,7 @@ async def start_bot():
 async def main():
     await asyncio.gather(
         start_web(),
-        start_bot(),
+        start_bot()
     )
 
 
