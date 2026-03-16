@@ -1,19 +1,97 @@
 import asyncio
+import hashlib
+import json
 import os
+import random
+from pathlib import Path
+from typing import Any, Dict, Optional, Tuple
 
+import httpx
 from aiohttp import web
-from aiogram import Bot, Dispatcher, Router
-from aiogram.filters import CommandStart
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
+from aiogram import Bot, Dispatcher, F, Router
+from aiogram.filters import Command
+from aiogram.types import (
+    CallbackQuery,
+    FSInputFile,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    Message,
+    ReplyKeyboardMarkup,
+    WebAppInfo,
+)
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "7713470997:AAEvpPQK_aw5A4REz7HLPXKKWtmT-kFoSzU")
+# ================== ENV / SETTINGS ==================
+BOT_TOKEN = os.getenv("BOT_TOKEN", "7713470997:AAG0jqwe0fiYb1Qn-lSRVvvgrePcuAyeZ4M")
 BASE_URL = os.getenv("BASE_URL", "https://ai-trade-terminal-bot-production.up.railway.app")
 PORT = int(os.getenv("PORT", "8080"))
 
+PARTNER_ID = os.getenv("PARTNER_ID", "51641")
+API_TOKEN = os.getenv("API_TOKEN", "https://affiliate.pocketoption.com/api/user-info/{user_id}/{partner_id}/{hash}")
+
+REF_LINK = os.getenv("REF_LINK", "https://u3.shortink.io/smart/ROGGOnnWSoGn5O")
+REVIEWS_GROUP_LINK = os.getenv("REVIEWS_GROUP_LINK", "https://t.me/+6jtb0MDtb_A0YTQy")
+
+BASE_DIR = Path(__file__).resolve().parent
+BANNER_PATH = BASE_DIR / "vip_banner.png"
+
+AUTO_CHECK_EVERY_SEC = 10 * 60
+AUTO_CHECK_TOTAL_SEC = 3 * 60 * 60
+AUTO_CHECK_MAX_RUNS = max(1, AUTO_CHECK_TOTAL_SEC // AUTO_CHECK_EVERY_SEC)
+
 router = Router()
 
+# ================== TEXTS ==================
+VIP_CAPTION = (
+    "☑️ <b>ВАРИАНТЫ VIP ПОДПИСКИ</b>\n"
+    "Пожалуйста выберите вариант\n"
+    "по которому хотите попасть в закрытый чат 👇🏻"
+)
 
-def main_keyboard() -> ReplyKeyboardMarkup:
+FREE_TEXT = (
+    "🎁 <b>БОТ БЕСПЛАТНО</b>\n\n"
+    "<b>Чтобы получить доступ, сделай 3 простых шага:</b>\n\n"
+    "1️⃣ <b>Зарегистрируйся по моей ссылке</b>\n"
+    f"👉 {REF_LINK}\n\n"
+    "⚠️ <b>ВАЖНО</b>\n"
+    "Если у тебя уже есть аккаунт Pocket Option — старый аккаунт нужно удалить.\n"
+    "Торговать можно только на аккаунте, который зарегистрирован по моей ссылке.\n\n"
+    "Если этого не сделать — пароль будет изменён, и ты потеряешь доступ к боту.\n\n"
+    "2️⃣ <b>Внеси депозит</b>\n"
+    "Рекомендую от <b>50$</b> для комфортной работы.\n\n"
+    "3️⃣ <b>Нажми «Скинуть ID для проверки»</b> ✅"
+)
+
+BOT_ACCESS_TEXT = (
+    "🤖 <b>@TestTradeView_bot — рекомендации по работе с ботом</b>\n\n"
+    "✅ <b>Основные правила:</b>\n"
+    "1️⃣ Если баланс ниже 200$ — торгуй фиксированной суммой.\n"
+    "2️⃣ Не входи в сделки, когда рынок импульсивный и на свечах большие тени.\n\n"
+    "🔐 <b>Твой индивидуальный пароль к боту:</b>\n"
+    "<code>666666</code>\n\n"
+    "⚠️ <b>ВАЖНО</b>\n"
+    "Торговать можно только на аккаунте, который зарегистрирован по моей ссылке.\n"
+    "Если будешь торговать на старом/другом аккаунте — пароль изменится,\n"
+    "и ты потеряешь доступ к боту.\n\n"
+    "📈 Соблюдай правила — и результат не заставит себя ждать!"
+)
+
+
+def make_recruit_text() -> str:
+    online = random.randint(120, 210)
+    left_slots = random.randint(3, 9)
+    today_profit = random.randint(900, 5800)
+    return (
+        "🔥 <b>ОТКРЫТ НАБОР В VIP</b>\n\n"
+        f"👥 Онлайн сейчас: <b>{online}</b>\n"
+        f"🎯 Осталось мест: <b>{left_slots}</b>\n"
+        f"📈 Сегодня в чате: <b>+${today_profit}</b>\n\n"
+        "Успей попасть в команду 🚀"
+    )
+
+
+# ================== KEYBOARDS ==================
+def terminal_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [
@@ -29,22 +107,385 @@ def main_keyboard() -> ReplyKeyboardMarkup:
     )
 
 
-@router.message(CommandStart())
-async def start_handler(message: Message):
-    text = (
-        "💎 <b>Добро пожаловать в Chrome Trade Terminal</b>\n\n"
-        "Премиальный торговый mini app нового поколения внутри Telegram.\n\n"
-        "⚡ Сигналы по нескольким рынкам\n"
-        "📈 Анализ активов внутри терминала\n"
-        "🧠 Большой учебный блок\n"
-        "♟ Торговые стратегии и схемы\n"
-        "🛟 Поддержка внутри приложения\n\n"
-        "Нажми кнопку ниже и открой терминал.\n"
-        "🚀 <b>Открыть терминал</b>"
+def kb_want_team() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="🚀 ХОЧУ В КОМАНДУ", callback_data="open_vip")]
+        ]
     )
-    await message.answer(text, parse_mode="HTML", reply_markup=main_keyboard())
 
 
+def vip_buttons() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="БЕСПЛАТНО-реферальная ссылка", callback_data="free_info")],
+            [InlineKeyboardButton(text="ОТЗЫВЫ УЧАСТНИКОВ", url=REVIEWS_GROUP_LINK)],
+        ]
+    )
+
+
+def free_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="🔗 Перейти по ссылке", url=REF_LINK),
+                InlineKeyboardButton(text="📨 Скинуть ID для проверки", callback_data="send_id"),
+            ],
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_vip")],
+        ]
+    )
+
+
+def deposit_check_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="💳 ДЕПОЗИТ СДЕЛАЛ — СКИНУТЬ ID НА ПРОВЕРКУ",
+                    callback_data="send_id",
+                )
+            ]
+        ]
+    )
+
+
+# ================== AFFILIATE API ==================
+def make_hash(user_id: str, partner_id: str, api_token: str) -> str:
+    raw = f"{user_id}:{partner_id}:{api_token}"
+    return hashlib.md5(raw.encode("utf-8")).hexdigest()
+
+
+async def fetch_user_info(trader_id: str) -> Dict[str, Any]:
+    h = make_hash(trader_id, PARTNER_ID, API_TOKEN)
+    url = f"https://affiliate.pocketoption.com/api/user-info/{trader_id}/{PARTNER_ID}/{h}"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; PocketAffiliateBot/1.0)",
+        "Accept": "application/json,text/plain,*/*",
+    }
+
+    async with httpx.AsyncClient(timeout=25, follow_redirects=True, headers=headers) as client:
+        r = await client.get(url)
+
+        if r.status_code != 200:
+            try:
+                return {"_http_status": r.status_code, "_error_json": r.json()}
+            except Exception:
+                return {"_http_status": r.status_code, "_error_text": r.text[:800]}
+
+        return r.json()
+
+
+def _to_number(v: Any) -> Optional[float]:
+    if isinstance(v, (int, float)):
+        return float(v)
+    if isinstance(v, str):
+        s = v.strip().replace(",", ".")
+        try:
+            return float(s)
+        except Exception:
+            return None
+    return None
+
+
+def find_ftd_anywhere(obj: Any) -> bool:
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            k_low = str(k).lower()
+
+            if k_low == "sum_ftd":
+                num = _to_number(v)
+                if num is not None and num > 0:
+                    return True
+
+            if k_low in {"ftd", "is_ftd", "has_ftd", "first_deposit", "first_deposit_done"}:
+                if v in (1, True, "1", "true", "True", "yes", "YES"):
+                    return True
+
+            if k_low in {"ftd_amount", "ftd_sum", "first_deposit_amount", "deposits_sum", "deposit_sum", "total_deposits"}:
+                num = _to_number(v)
+                if num is not None and num > 0:
+                    return True
+
+            if "ftd" in k_low or ("first" in k_low and "deposit" in k_low):
+                if v in (1, True, "1", "true", "True"):
+                    return True
+                num = _to_number(v)
+                if num is not None and num > 0:
+                    return True
+
+        return any(find_ftd_anywhere(x) for x in obj.values())
+
+    if isinstance(obj, list):
+        return any(find_ftd_anywhere(x) for x in obj)
+
+    return False
+
+
+def parse_status(data: Dict[str, Any]) -> Tuple[bool, bool]:
+    if not isinstance(data, dict):
+        return False, False
+
+    if "_http_status" in data:
+        return False, False
+
+    if data.get("error") is True:
+        return False, False
+
+    is_registered = any(
+        k in data and data.get(k) not in (None, "", False, 0)
+        for k in ("user_id", "trader_id", "id", "status", "email", "country", "currency", "sum_ftd")
+    )
+
+    is_ftd = find_ftd_anywhere(data)
+    return is_registered, is_ftd
+
+
+# ================== AUTO CHECK ==================
+PENDING: Dict[int, Dict[str, Any]] = {}
+WAITING_ID = set()
+
+
+async def send_terminal_access(message: Message):
+    await message.answer(BOT_ACCESS_TEXT, parse_mode="HTML")
+    await message.answer(
+        "💎 <b>Доступ открыт</b>\n\nНажми кнопку ниже, чтобы открыть торговый терминал.",
+        parse_mode="HTML",
+        reply_markup=terminal_keyboard(),
+    )
+
+
+async def auto_check_loop(tg_id: int, trader_id: str, chat_id: int, bot: Bot):
+    runs_left = AUTO_CHECK_MAX_RUNS
+    await asyncio.sleep(random.randint(10, 45))
+
+    while runs_left > 0:
+        state = PENDING.get(tg_id)
+        if not state:
+            return
+
+        trader_id = state.get("trader_id", trader_id)
+        chat_id = state.get("chat_id", chat_id)
+
+        try:
+            data = await fetch_user_info(trader_id)
+            if "_http_status" not in data:
+                is_reg, is_ftd = parse_status(data)
+                if is_reg and is_ftd:
+                    PENDING.pop(tg_id, None)
+                    await bot.send_message(chat_id, "✅ <b>FTD подтвержден!</b>\n🔥 Доступ активирован 🚀", parse_mode="HTML")
+                    await bot.send_message(chat_id, BOT_ACCESS_TEXT, parse_mode="HTML")
+                    await bot.send_message(
+                        chat_id,
+                        "💎 <b>Терминал готов к работе</b>\n\nНажми кнопку ниже:",
+                        parse_mode="HTML",
+                        reply_markup=terminal_keyboard(),
+                    )
+                    return
+        except Exception:
+            pass
+
+        runs_left -= 1
+        if PENDING.get(tg_id):
+            PENDING[tg_id]["runs_left"] = runs_left
+
+        await asyncio.sleep(AUTO_CHECK_EVERY_SEC + random.randint(0, 30))
+
+    PENDING.pop(tg_id, None)
+    try:
+        await bot.send_message(
+            chat_id,
+            "⏳ Я проверял FTD автоматически, но депозит ещё не отобразился.\n\n"
+            "Если депозит уже сделал — нажми кнопку и скинь ID ещё раз ✅",
+            parse_mode="HTML",
+            reply_markup=deposit_check_kb()
+        )
+    except Exception:
+        pass
+
+
+def start_or_refresh_auto_check(tg_id: int, trader_id: str, chat_id: int, bot: Bot):
+    if tg_id in PENDING and PENDING[tg_id].get("task") and not PENDING[tg_id]["task"].done():
+        PENDING[tg_id]["trader_id"] = trader_id
+        PENDING[tg_id]["chat_id"] = chat_id
+        return
+
+    task = asyncio.create_task(auto_check_loop(tg_id, trader_id, chat_id, bot))
+    PENDING[tg_id] = {
+        "task": task,
+        "trader_id": trader_id,
+        "chat_id": chat_id,
+        "runs_left": AUTO_CHECK_MAX_RUNS
+    }
+
+
+# ================== HELPERS ==================
+async def send_vip_screen(message: Message):
+    if not BANNER_PATH.exists():
+        await message.answer(f"❌ Не найден vip_banner.png\nПуть:\n{BANNER_PATH}")
+        return
+
+    banner = FSInputFile(str(BANNER_PATH))
+    await message.answer_photo(
+        photo=banner,
+        caption=VIP_CAPTION,
+        parse_mode="HTML",
+        reply_markup=vip_buttons(),
+    )
+
+
+def normalize_id(text: str) -> str:
+    return (text or "").strip().replace(" ", "")
+
+
+def looks_like_id(text: str) -> bool:
+    return text.isdigit() and 4 <= len(text) <= 20
+
+
+# ================== BOT HANDLERS ==================
+@router.message(Command("start"))
+async def start_handler(message: Message):
+    await message.answer(make_recruit_text(), parse_mode="HTML", reply_markup=kb_want_team())
+
+
+@router.message(Command("strat"))
+async def strat_handler(message: Message):
+    await message.answer(make_recruit_text(), parse_mode="HTML", reply_markup=kb_want_team())
+
+
+@router.message(Command("terminal"))
+async def terminal_handler(message: Message):
+    await message.answer(
+        "🚀 <b>Открытие терминала</b>",
+        parse_mode="HTML",
+        reply_markup=terminal_keyboard(),
+    )
+
+
+@router.callback_query(F.data == "open_vip")
+async def open_vip(callback: CallbackQuery):
+    await callback.answer()
+    await send_vip_screen(callback.message)
+
+
+@router.callback_query(F.data == "free_info")
+async def free_info_handler(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.edit_caption(
+        caption=FREE_TEXT,
+        parse_mode="HTML",
+        reply_markup=free_kb(),
+    )
+
+
+@router.callback_query(F.data == "send_id")
+async def send_id_handler(callback: CallbackQuery):
+    await callback.answer()
+    WAITING_ID.add(callback.from_user.id)
+    await callback.message.answer(
+        "🆔 <b>Скиньте ваш ID торгового аккаунта в чат</b> 👇\n\n"
+        "⏳ <b>Проверка</b> займет от <b>1</b> минуты до <b>30</b> минут ✅",
+        parse_mode="HTML",
+    )
+
+
+@router.callback_query(F.data == "back_to_vip")
+async def back_to_vip(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.edit_caption(
+        caption=VIP_CAPTION,
+        parse_mode="HTML",
+        reply_markup=vip_buttons(),
+    )
+
+
+@router.message(F.text)
+async def catch_id_message(message: Message):
+    if message.from_user.id not in WAITING_ID:
+        return
+
+    trader_id = normalize_id(message.text)
+    if not looks_like_id(trader_id):
+        await message.answer("❌ ID должен быть только цифрами. Отправь ID ещё раз ✅")
+        return
+
+    WAITING_ID.discard(message.from_user.id)
+    wait_msg = await message.answer("⏳ <b>Проверяем…</b> Подожди пару секунд ✅", parse_mode="HTML")
+
+    try:
+        data = await fetch_user_info(trader_id)
+
+        if "_http_status" in data:
+            status = data.get("_http_status")
+            err_txt = ""
+            if "_error_json" in data:
+                err_txt = json.dumps(data["_error_json"], ensure_ascii=False)[:800]
+            else:
+                err_txt = str(data.get("_error_text", ""))[:800]
+
+            if status == 404:
+                await wait_msg.edit_text(
+                    "❌ <b>ID не найдено</b>\n\n"
+                    "Проверь правильность ID.\n"
+                    "Важно: аккаунт должен быть зарегистрирован по моей ссылке ✅",
+                    parse_mode="HTML",
+                )
+                return
+
+            await wait_msg.edit_text(
+                "⚠️ <b>Ошибка проверки</b>\n\n"
+                f"Сервис вернул статус: <code>{status}</code>\n"
+                f"<code>{err_txt}</code>\n\n"
+                "Попробуй снова через пару минут ✅",
+                parse_mode="HTML",
+            )
+            return
+
+        is_reg, is_ftd = parse_status(data)
+
+        if not is_reg:
+            await wait_msg.edit_text(
+                "❌ <b>Не найдено</b>\n\n"
+                "Проверь, правильный ли ID.\n"
+                "Если ты только что зарегистрировался — подожди 2-5 минут и отправь ID снова ✅",
+                parse_mode="HTML",
+            )
+            return
+
+        if is_ftd:
+            await wait_msg.edit_text(
+                "✅ <b>FTD подтвержден</b>\n\n"
+                "🔥 Доступ активирован. Добро пожаловать в VIP 🚀",
+                parse_mode="HTML",
+            )
+            if message.from_user.id in PENDING:
+                PENDING.pop(message.from_user.id, None)
+
+            await send_terminal_access(message)
+
+        else:
+            start_or_refresh_auto_check(message.from_user.id, trader_id, message.chat.id, message.bot)
+
+            minutes = AUTO_CHECK_EVERY_SEC // 60
+            hours = AUTO_CHECK_TOTAL_SEC // 3600
+            await wait_msg.edit_text(
+                "✅ <b>Регистрация подтверждена</b>\n\n"
+                "💳 Теперь сделай депозит (FTD) — после этого выдадим полный доступ ✅\n\n"
+                f"🤖 Я буду проверять FTD автоматически каждые <b>{minutes} мин</b> (до <b>{hours} часов</b>) и открою доступ сразу, как депозит отобразится.",
+                parse_mode="HTML",
+                reply_markup=deposit_check_kb(),
+            )
+
+    except Exception as ex:
+        await wait_msg.edit_text(
+            "⚠️ <b>Ошибка проверки</b>\n\n"
+            "Попробуй снова через пару минут ✅",
+            parse_mode="HTML",
+        )
+        print("ERROR:", repr(ex))
+
+
+# ================== TERMINAL HTML ==================
 def build_html() -> str:
     return r"""
 <!DOCTYPE html>
@@ -1984,6 +2425,8 @@ def build_html() -> str:
 </html>
 """
 
+
+# ================== WEB ROUTES ==================
 async def index(request: web.Request) -> web.Response:
     return web.Response(text="Chrome Trade Terminal is running", content_type="text/plain")
 
@@ -2014,10 +2457,14 @@ async def start_web():
 
 
 async def start_bot():
-    if not BOT_TOKEN or BOT_TOKEN == "PASTE_YOUR_BOT_TOKEN":
-      raise RuntimeError("Укажи BOT_TOKEN")
+    if not BOT_TOKEN:
+        raise RuntimeError("Укажи BOT_TOKEN")
     if not BASE_URL or BASE_URL == "https://your-domain.up.railway.app":
-      raise RuntimeError("Укажи BASE_URL")
+        raise RuntimeError("Укажи BASE_URL")
+    if not PARTNER_ID:
+        raise RuntimeError("Укажи PARTNER_ID")
+    if not API_TOKEN:
+        raise RuntimeError("Укажи API_TOKEN")
 
     bot = Bot(BOT_TOKEN)
     dp = Dispatcher()
